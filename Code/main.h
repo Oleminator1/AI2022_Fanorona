@@ -5,6 +5,8 @@
 #ifndef AI2022_FANORONA_MAIN_H
 #define AI2022_FANORONA_MAIN_H
 
+#include <iostream>
+#include "BoardGameAI/BoardGame.h"
 
 class main {
 
