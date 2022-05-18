@@ -5,7 +5,7 @@ include(CTest)
 enable_testing()
 
 set(CMAKE_CXX_STANDARD 20)
-add_executable(fanorona-server main.cpp)
+add_executable(fanorona-server main.cpp game/fanorona-game.cpp)
 
 include_directories(include)
 
