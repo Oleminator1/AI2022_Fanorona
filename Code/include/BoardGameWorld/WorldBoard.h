@@ -1,0 +1,8 @@
+//
+// Created by Oliver on 18.05.2022.
+//
+
+#ifndef AI2022_FANORONA_WORLDBOARD_H
+#define AI2022_FANORONA_WORLDBOARD_H
+
+#endif //AI2022_FANORONA_WORLDBOARD_H
