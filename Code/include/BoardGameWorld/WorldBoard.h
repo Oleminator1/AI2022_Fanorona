@@ -1,11 +1,15 @@
 //
-// Created by Oliver on 18.05.2022.
-// Updated by Oliver on 01.06.2022.
-// Based on: https://github.com/gauravahuja/Fanorona_AI/blob/master/Fanorona/Board.h
-#ifndef AI2022_FANORONA_WORLDBOARD_H
-#define AI2022_FANORONA_WORLDBOARD_H
+// Created by Oliver on 01.06.2022.
+//
+#include <iostream>
+using namespace std;
 
-#endif //AI2022_FANORONA_WORLDBOARD_H
+#ifndef FANORONA_SERVER_WORLDBOARD_H
+#define FANORONA_SERVER_WORLDBOARD_H
 
+#endif //FANORONA_SERVER_WORLDBOARD_H
 
-
+void wboard(){
+    system("cls");
+    cout << "\n\nFanorona\n\n";
+}

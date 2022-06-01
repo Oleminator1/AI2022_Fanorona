@@ -40,13 +40,16 @@ void menu(){
         switch(choice) {
             case 1:
                 //open WorldBoard.h
+                wboard();
                 break;
             case 2:
                 //Open WorldBoard.h
+                wboard();
                 //Open AI Vs. Player
                 break;
             case 3:
                 //Open WorldBoard.h
+                wboard();
                 //open AI Vs. AI
                 break;
             case 4:

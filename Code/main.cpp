@@ -4,7 +4,6 @@
 
 #include "main.h"
 #include "BoardGameWorld/WorldUI.h"
-#include "BoardGAmeWorld/WorldBoard.h"
 int main() {
     menu();
 }
