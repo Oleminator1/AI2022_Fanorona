@@ -5,7 +5,7 @@
 
 #include <cstdlib>
 #include <iostream>
-
+#include "WorldBoard.h"
 using namespace std;
 
 #ifndef AI2022_FANORONA_WORLDUI_H
@@ -15,36 +15,44 @@ using namespace std;
 
 void menu();
 void mainMenu();
-int choice1 = 0;
-int choice2 = 3;
+
+int GetInput(){
+    int choice;
+    cin >> choice;
+    return choice;
+}
+void mainMenu(){
+    cout << "Welcome to Fanorona:\n";
+    cout << "Choose your Playing Style:\n";
+    cout << "1 - Player VS. Player\n";
+    cout << "2 - Player VS. Computer\n";
+    cout << "3 - Computer Vs. Computer\n";
+    cout << "4 - Quit Game\n";
+}
 
 void menu(){
-    do {
-        choice2 = 0;
-        mainMenu();
+    int choice = 0;
 
-        switch(choice1) {
+    do {
+        system("cls");
+        mainMenu();
+        choice = GetInput();
+        switch(choice) {
             case 1:
                 //open WorldBoard.h
                 break;
             case 2:
-                //open WorldBoard.h
+                //Open WorldBoard.h
+                //Open AI Vs. Player
                 break;
             case 3:
+                //Open WorldBoard.h
+                //open AI Vs. AI
+                break;
+            case 4:
                 break;
         }
-    } while(choice1 != 3);
+    } while(choice != 4);
+    system("Pause");
 }
 
-void mainMenu(){
-    cout << "Welcome to Fanorona:\n";
-        cout << "Choose your Playing Style:\n";
-        cout << "1 - Player VS. Player\n";
-        cout << "2 - Player VS. Computer\n";
-        cout << "3 - Quit Game";
-}
-
-int main(int argc, char *argv[]){
-    menu();
-    return 0;
-}

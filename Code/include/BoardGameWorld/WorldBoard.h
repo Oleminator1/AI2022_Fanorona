@@ -7,4 +7,3 @@
 
 #endif //AI2022_FANORONA_WORLDBOARD_H
 
-char

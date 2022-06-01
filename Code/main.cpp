@@ -3,7 +3,7 @@
 //
 
 #include "main.h"
-
+#include "BoardGameWorld/WorldUI.h"
 int main() {
-    
+    menu();
 }
