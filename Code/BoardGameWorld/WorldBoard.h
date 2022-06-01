@@ -6,10 +6,5 @@ using namespace std;
 
 #ifndef FANORONA_SERVER_WORLDBOARD_H
 #define FANORONA_SERVER_WORLDBOARD_H
-
+void wboard();
 #endif //FANORONA_SERVER_WORLDBOARD_H
-
-void wboard(){
-    system("cls");
-    cout << "\n\nFanorona\n\n";
-}
