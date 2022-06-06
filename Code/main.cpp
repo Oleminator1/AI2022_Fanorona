@@ -5,6 +5,7 @@
 #include <websocketpp/server.hpp>
 
 #include <iostream>
+#include "game/fanorona-game.h"
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
@@ -14,6 +15,8 @@ using websocketpp::lib::bind;
 
 // pull out the type of messages sent by our config
 typedef server::message_ptr message_ptr;
+
+FanoronaGame game;
 
 // Define a callback to handle incoming messages
 void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
@@ -28,10 +31,12 @@ void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
         return;
     }
 
+    std::string resp = game.as_json().dump();
+
     try {
-        s->send(hdl, msg->get_payload(), msg->get_opcode());
+        s->send(hdl, resp, msg->get_opcode());
     } catch (websocketpp::exception const & e) {
-        std::cout << "Echo failed because: "
+        std::cout << "Response failed because: "
                   << "(" << e.what() << ")" << std::endl;
     }
 }
