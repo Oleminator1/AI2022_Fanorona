@@ -1,0 +1,9 @@
+FK & JK & PM:
+  > Create on a drive the functions to implement on FanoronaGame, split them up
+    > Movement functions
+    > Verifying functions
+  > Implement doing moves in FanoronaGame, verify basic rules
+LH & OJ:
+  > Receiving commands for moves
+  > Executing them
+  > Return boards or error states
