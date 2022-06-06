@@ -41,7 +41,6 @@ void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
     }
 }
 
-
 int main() {
     // Create a server endpoint
     server echo_server;

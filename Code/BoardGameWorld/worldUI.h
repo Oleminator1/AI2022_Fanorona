@@ -5,7 +5,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include "WorldBoard.h"
+#include "worldBoard.h"
 using namespace std;
 
 #ifndef AI2022_FANORONA_WORLDUI_H
