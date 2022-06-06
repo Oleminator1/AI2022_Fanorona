@@ -14,7 +14,7 @@ class FanoronaGame : BoardGame<FanoronaGame> {
         {
             private:
                 int index;
-                static constexpr std::array<Move, 7> orderedMoves = { { 4,3,5,2,6,1,7 } };
+                //static constexpr std::array<Move, 7> orderedMoves = { { 4,3,5,2,6,1,7 } };
             public:
                 MoveGenerator();
                 Move nextMove();
