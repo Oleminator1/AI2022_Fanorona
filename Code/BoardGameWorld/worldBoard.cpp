@@ -1,7 +1,7 @@
 //
-// Created by Olive on 01.06.2022.
+// Created by Oliver on 01.06.2022.
 //
-#include "WorldBoard.h"
+#include "worldBoard.h"
 void wboard(){
     cout << "\n\nFanorona\n\n";
     cout << "#---#---#---#---#---#---#---#---#" << endl; // # = Black Stone

@@ -1,7 +1,7 @@
 //
 // Created by Olive on 01.06.2022.
 //
-#include "Stones.h"
+#include "stones.h"
 
 void blackStone(){
 
