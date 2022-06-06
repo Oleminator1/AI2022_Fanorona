@@ -1,0 +1,94 @@
+  //Functions to Implement:
+    MoveGenerator::generate()
+         //applies the evaluation functions and provides a list of possible moves for the selected stone.
+
+
+Use Case 1: What are valid selection stones?
+
+                Evaluate for each Player stone - (board[i][j] == 1 or 2) B/W stone:
+                
+                    bool is_strong_position(X, Y)
+                    //function to evaluate whether we are on a strongly or weakly connected node.
+                        true: has 8 neighbours
+                        false: has 4 neighbours
+                   
+                   
+                   int empty_neighbours(x1,y1) 
+                    //evaluate position! -> how many neighbours
+                    //is there an empty space in on of the neighboursthe neighbour?
+                    
+
+                    bool capturing_moves(X,Y)          
+                            true:    Player must select  stone with capturing move 
+                                    withdraw: -> check for 1 empty space and opponent stone in opposite nieghbour! 
+                                    approach: -> check for 1 empty space then opponent stone!
+                               
+                                    
+                            false:     Player free to select stone with valid move:
+                                    empty neighbor board[i][j] == 0
+                                    and on the grid 0 >= i <= 8 && 0 >= j <= 4
+                                    
+                                    careful for strong and weak position (connectivity)
+                    
+                    
+                    void evaluate_player_stones(player=1)
+                    //Apply the above functions to each stone and generate all necessary 
+                    lists/variables to make a valid selection ->
+                  
+                   Loop through each Board_pos:
+                        check if player stone, ie board[i][j] == player
+                                is_strong_position?
+                                    true: check 8, neighbourhood cells
+                                    false: check 4 neighbourhood cells
+                                    
+                                if empty_neighbours(nhood type, pos) == 0
+                                    move on, stone can't be moved
+                                
+                               
+                                if capturing_moves:
+                                    true: add to capture_list
+                                    false: add to move_list if capture_list != NULL
+                                     
+                    
+
+             
+
+Use Case 2: 1 Valid Stone is selected, i.e. inputs are array coordinates X_i, Y_i
+//capture_list and move_list containing indices of valid selections
+//A.I Evaluation of what moves are better, heuristics come here
+
+
+Use Case  3: Making a move
+                void move_stone(x1,y1, x2,y2)
+                 // set (x2,y2) to the value in (x1,y1) then set (x1,y1) to 0
+        
+                void clear_diagonal(direction, x2,y2)
+                //keep moving along diagonal from new move (x2,y2)
+                //if board[i][j] is 0 or own player stop
+                //else set it to 0 (assume other player stone)
+
+                void clear_horizontal(direction, x2,y2)
+                //keep moving along horizontal from new move (x2,y2)
+                //if board[i][j] is 0 or own player stop
+                //else set it to 0 (assume other player stone)
+
+                void clear_vertical(direction, x2,y2)
+                //keep moving along vertical from new move (x2,y2)
+                //if board[i][j] is 0 or own player stop
+                //else set it to 0 (assume other player stone)
+
+                void capture_approach(x1, y1, x2, y2)
+                //evaluate direction of move. 
+                //set all approached stones to 0 using helpers of clear. 1 - 0 - 2 -> 0 - 1 - 0 
+                move_stone(x1,y1, x2,y2)
+                
+                void capture_withdraw(x1, y1, x2, y2)
+                //evaluate direction of move. 
+                //set all withdrawed stones to 0 using helpers of clear.  0 - 1 - 2 -> 1 - 0 - 0
+                move_stone(x1,y1, x2,y2)
+                
+  Use Case 4: Multiple actions in a single turn
+                //track visited nodes 
+                //evaluate if there are more valid moves from current position
+                //bool to continue and make move or to break and end turn
+
