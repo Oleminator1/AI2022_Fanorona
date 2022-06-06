@@ -1,3 +1,5 @@
+Next Meeting: Friday, 18:00 - 10.06
+
 FK & JK & PM:
   > Create on a drive the functions to implement on FanoronaGame, split them up
     > Movement functions
