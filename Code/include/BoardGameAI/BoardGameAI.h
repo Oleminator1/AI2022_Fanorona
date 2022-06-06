@@ -136,7 +136,7 @@ private:
 			}
 		}
 
-		int16_t bestValue = -INFINITE;
+		int16_t bestValue = -AI_INFINITE;
 		Move move;
 		MovePicker<BoardGameAI<GameType, options, tTableSizeMB>> movePicker(*this, game.get(), bestMove);
 		while ((move = movePicker.nextMove()) != MOVE_NONE)
@@ -238,7 +238,7 @@ private:
 			}
 
 			depthReached = false;
-			int scoreTmp = alphaBeta<true>(currentMaxDepth, -INFINITE, INFINITE);
+			int scoreTmp = alphaBeta<true>(currentMaxDepth, -AI_INFINITE, AI_INFINITE);
 			if (!abortSearch)
 			{
 				// only use best move/score from previous search if search was completed
@@ -259,7 +259,7 @@ private:
 	{
 		initializeSearch();
 
-		int16_t score = alphaBeta<true>(maxDepth, -INFINITE, INFINITE);
+		int16_t score = alphaBeta<true>(maxDepth, -AI_INFINITE, AI_INFINITE);
 		return SearchResult(score, bestRootMoveTmp, maxDepth);
 	}
 	int16_t evaluatePosition()
