@@ -1,0 +1,105 @@
+@charset "utf-8";
+/* CSS Document */
+
+*{
+    margin:0px;
+
+
+}
+.container {
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color:#FFC;
+}
+
+.header {
+    left:0px;
+    top:0px;
+    border:none;
+    padding-left:0px;
+    padding-top:0px;
+    height:130px;
+    width:100%;
+    background-color:#FF9;
+    overflow:hidden;
+    display:block;
+}
+
+.contents {
+    position:relative;
+    overflow:hidden;
+    padding-top:100px;
+}
+
+.heading {
+    font: Arial, Helvetica, sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: #C60;
+}
+
+.Title {
+    font-family:"Arial Black", Gadget, sans-serif;
+    color:#C60;
+    padding-top: 20px;
+    padding-bottom:10px;
+    padding-left:60px;
+    padding-right:20px;
+}
+.MainTitle {
+    font-size:50px;
+    font-weight:800;
+    font-stretch:extra-expanded;
+    font-style:normal
+}
+.SubTitle {
+    font-size:28px;
+    font-style:oblique;
+}
+
+.button {
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:24px;
+    color: #000;
+    background-color:#FF9;
+    border-radius:3px;
+
+}
+.button:hover, .button:focus, .button:active {
+    background-color:#C60;
+    color:#FFF;
+}
+
+.statsTable {
+    border-style:double;
+    border-color:#999;
+}
+
+.statsTable td{
+    border-bottom-style:solid;
+    border-right-style:solid;
+    border-color:#CCC;
+}
+
+.statsTable td {
+    font:Arial, Helvetica, sans-serif;
+    font-size:20px;
+    font-weight:500;
+    width:130px;
+    height:50px;
+}
+
+.Logout a {
+    color:#000;
+    text-decoration:none
+}
+
+
+
+
+.show {
+    display:block;
+}

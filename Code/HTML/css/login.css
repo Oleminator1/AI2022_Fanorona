@@ -1,0 +1,59 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+.formDetail {
+    font-size:24px;
+    text-align:center;
+    height:40px;
+    background-color:#FF9;
+    border-radius: 5px;
+    border-bottom-width:3px;
+    border-bottom-color:#CCC;
+    border-bottom-style:solid;
+    border-right-color:#CCC;
+    border-right-style:outset;
+    border-right-width:3px;
+}
+
+.formBttn {
+    width:140px;
+    height:50px;
+    background-color:#FF9;
+    border-style:none;
+    border-radius:5px;
+    border-bottom-width:3px;
+    border-bottom-color:#006;
+    border-bottom-style:outset;
+    border-right-color:#006;
+    border-right-style:outset;
+    border-right-width:3px;
+    font-size:28px;
+    color:#999;
+    font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+.formBttn:hover, .formBttn:focus, .formBttn:active {
+    border-style:none;
+    background-color:#C60;
+    color:#FFF;
+}
+.formOptions a, .formOptions a:visited {
+    text-decoration:none;
+    font-size:16px;
+    color:#999;
+}
+.formOptions a:hover, .formOptions a:focus {
+
+    color:#C60;
+}
+
+.formText {
+    font-size:24px;
+    text-align:center;
+    border-color:#CCC;
+    border-width:1px;
+    border-radius:5px;
+    font-family:Arial, Helvetica, sans-serif;
+    color:#999;
+    padding: 3px 10px 3px;
+}
