@@ -10,7 +10,7 @@ enum Bound : uint8_t {
 };
 static const int WINNING_VALUE = 32000;
 
-static const int INFINITE = 32700;
+static const int AI_INFINITE = 32700;
 
 typedef uint16_t Value;
 
