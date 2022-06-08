@@ -61,6 +61,7 @@ Use Case 2: 1 Valid Stone is selected, i.e. inputs are array coordinates X_i, Y_
 Use Case  3: Making a move
                 void move_stone(x1,y1, x2,y2)
                  // set (x2,y2) to the value in (x1,y1) then set (x1,y1) to 0
+                 // return direction for clear functions, evaluate!
         
                 void clear_diagonal(direction, x2,y2)
                 //keep moving along diagonal from new move (x2,y2)
