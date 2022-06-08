@@ -4,7 +4,6 @@
 
 using namespace std;
 
-
 void initializeGrid(int grid[5][9])
 {
     // Fill the empty grid with stones
@@ -54,9 +53,24 @@ void printGrid(int grid_[5][9])
 }
 
 bool isStrongPosition(int X, int Y)
+// Check if stone has a strong or weak position
 {
-    // Check if stone has a strong or weak position
-    return true;
+    if ((X%2) == 0) {
+        if ((Y%2) == 0) {
+            return true;
+        }
+        else {
+            return false;
+        }        
+    }
+    else {
+        if ((Y%2) == 0) {
+            return false;
+        }
+        else {
+            return true;
+        }       
+    }
 }
 
 bool emptyNeighbours(int X, int Y, bool strongPosition)
