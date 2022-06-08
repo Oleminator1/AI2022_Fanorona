@@ -31,7 +31,7 @@ void initializeGrid(int grid[5][9])
     }
 }
 
-void outputGrid(int grid_[5][9])
+void printGrid(int grid_[5][9])
 {
     // Print the grid in the console
     for (int row = 0; row < 5; row++) {
@@ -53,13 +53,13 @@ void outputGrid(int grid_[5][9])
     }
 }
 
-bool is_strong_position(int X, int Y)
+bool isStrongPosition(int X, int Y)
 {
     // Check if stone has a strong or weak position
     return true;
 }
 
-bool empty_neighbours(int X, int Y, bool strongPosition)
+bool emptyNeighbours(int X, int Y, bool strongPosition)
 {
     // Check if stone has empty neighbours
     return false;
@@ -83,7 +83,7 @@ void showPossibleStones(vector<vector<int>> possibleMoves)
 }
 
 
-void EvaluatePlayerStones(int player, int grid[5][9])
+void evaluatePlayerStones(int player, int grid[5][9])
 {
     // Evaluate all possibilites for the player
     bool strongPosition;
@@ -98,14 +98,14 @@ void EvaluatePlayerStones(int player, int grid[5][9])
                 continue;
             }
             // Check if stone has a strong or weak position
-            if (is_strong_position(row, column) == true) {
+            if (isStrongPosition(row, column) == true) {
                 strongPosition = true;
             }
             else {
                 strongPosition = false;
             }
             // Check if stone has empty neighbours
-            if (empty_neighbours(row, column, strongPosition) == false)
+            if (emptyNeighbours(row, column, strongPosition) == false)
             {
                 continue;
             }
@@ -139,10 +139,9 @@ int main()
     initializeGrid(grid);
 
     // Print the grid in the console
-    outputGrid(grid);
+    printGrid(grid);
 
     // Evaluate all possibilites for the player
     EvaluatePlayerStones(player, grid);
    
 }
-
