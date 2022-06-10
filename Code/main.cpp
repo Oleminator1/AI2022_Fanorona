@@ -13,25 +13,36 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
+#define KEY_COMMAND "command"
+#define CMD_ERROR "error"
+#define CMD_MOVE "move"
+
 // pull out the type of messages sent by our config
 typedef server::message_ptr message_ptr;
 
 FanoronaGame game;
+json json_error(std::string error) {
+    return {
+        {KEY_COMMAND, CMD_ERROR},
+        {"message", error}
+    };
+}
 
+json process_command(json& message) {
+    if(!message.contains(KEY_COMMAND)){
+        // no command, no bueno
+        return json_error("you fucked up");
+    }
+}
 // Define a callback to handle incoming messages
 void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
     std::cout << "on_message called with hdl: " << hdl.lock().get()
               << " and message: " << msg->get_payload()
               << std::endl;
-
-    // check for a special command to instruct the server to stop listening so
-    // it can be cleanly exited.
-    if (msg->get_payload() == "stop-listening") {
-        s->stop_listening();
-        return;
-    }
-
-    std::string resp = game.as_json().dump();
+    
+    // Parse command as JSON and process
+    auto message = json::parse(msg->get_payload());
+    std::string resp = process_command(message);
 
     try {
         s->send(hdl, resp, msg->get_opcode());
