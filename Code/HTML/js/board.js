@@ -1,6 +1,18 @@
 const BOARD_HEIGHT = 5;
 const BOARD_WIDTH = 9;
+const GAME_SERVER = "ws://127.0.0.1:9001";
 
+function MessageBox(element) {
+    this.element = element;
+
+    this.setMessage = (message, state) => {
+        this.element.textContent = message;
+        this.element.className = "message message-" + state;
+    }
+    this.setInfo = (message) => this.setMessage(message, "info");
+    this.setError = (message) => this.setMessage(message, "error");
+    this.setSuccess = (message) => this.setMessage(message, "success");
+}
 function GamePawn(x, y) {
     this.element = document.createElement("td");
     this.x = x;
@@ -67,6 +79,40 @@ function GameBoard(table) {
         this.table.appendChild(row);
     }
 }
+function GameConnection(address) {
+    this.address = address;
+    this.sock = new WebSocket(address);
 
+    this.onBoardUpdateCallback = null;
+    this.onErrorCallback = null;
+
+    this.startGame = () => {
+        this.sock.send(JSON.stringify({ cmd: "start" }));
+    }
+    this.movePawn = (from, to) => {
+        this.sock.send(JSON.stringify({ cmd: "move", from, to }));
+    }
+    this.onMessage = (msg) => {
+        if(msg.cmd === "board") {
+            this.onBoardUpdateCallback(msg.board);
+        } else if(msg.cmd === "error") {
+            this.onErrorCallback(msg.message);
+        } else {
+            console.error("Unknown command: " + msg.cmd);
+        }
+    }
+
+    this.onBoardUpdate = (callback) => this.onBoardUpdateCallback = callback;
+    this.onError = (callback) => this.onErrorCallback = callback;
+
+    this.sock.addEventListener("message", e => this.onMessage(JSON.parse(e.data)));
+}
+
+let mb = new MessageBox(document.getElementById("message"));
 let gb = new GameBoard(document.getElementById("pawnTable"));
-gb.setPawnStates([[2,2,2,1,1],[2,2,1,1,1],[2,2,2,1,1],[2,2,1,1,1],[2,2,0,1,1], [2,2,2,1,1],[2,2,1,1,1],[2,2,2,1,1],[2,2,1,1,1]]);
+
+let gc = new GameConnection(GAME_SERVER);
+gc.onBoardUpdate(board => gb.setPawnStates(board));
+gc.onError(message => mb.setError(message));
+
+//gb.setPawnStates([[2,2,2,1,1],[2,2,1,1,1],[2,2,2,1,1],[2,2,1,1,1],[2,2,0,1,1], [2,2,2,1,1],[2,2,1,1,1],[2,2,2,1,1],[2,2,1,1,1]]);
