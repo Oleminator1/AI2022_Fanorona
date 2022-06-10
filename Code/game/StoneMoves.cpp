@@ -52,11 +52,11 @@ void printGrid(int grid_[5][9])
     }
 }
 
-bool isStrongPosition(int X, int Y)
+bool isStrongPosition(int row, int col)
 // Check if stone has a strong or weak position
 {
-    if ((X%2) == 0) {
-        if ((Y%2) == 0) {
+    if ((row%2) == 0) {
+        if ((col%2) == 0) {
             return true;
         }
         else {
@@ -64,7 +64,7 @@ bool isStrongPosition(int X, int Y)
         }        
     }
     else {
-        if ((Y%2) == 0) {
+        if ((col%2) == 0) {
             return false;
         }
         else {
@@ -73,10 +73,72 @@ bool isStrongPosition(int X, int Y)
     }
 }
 
-bool emptyNeighbours(int X, int Y, bool strongPosition)
+bool emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition)
 {
-    // Check if stone has empty neighbours
-    return false;
+    int count = 0;
+    if (strongPosition) {
+        //check 3x3 Nhood
+        for (int i = row-1; i < row+2; i++) {
+            if ((i < 0 or i > 8) {
+                //Out of bounds
+                continue;
+            }
+            for (int j = col-1; j < col+2; j++) {
+                if ((j < 0 or j > 4) {
+                    //Out of bounds
+                    continue;
+                }
+                if (grid[i][j] == 0) {
+                    count += 1;   
+                }
+    }
+                    
+    else {
+        //Check cross Nhood
+        if (row-1 < 0) {
+            //Out of bounds
+            continue;
+        }
+        else {
+            if (grid[row-1][col] == 0) {
+                    count += 1;   
+            }
+        }
+        if (col-1 < 0) {
+            //Out of bounds
+            continue;
+        }
+        else {
+            if (grid[row][col-1] == 0) {
+                    count += 1;   
+            }
+        }
+        if (col+1 > 8) {
+            //Out of bounds
+            continue;
+        }
+        else {
+            if (grid[row][col+1] == 0) {
+                    count += 1;   
+            }
+        }
+        if (row+1 > 4) {
+            //Out of bounds
+            continue;
+        }
+        else {
+            if (grid[row+1][col] == 0) {
+                    count += 1;   
+            }
+        }
+        
+    }
+    if (count > 0) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 void capturingMoves(int X, int Y, bool strongPosition, vector<vector<int>> captureList, vector<vector<int>> moveList)
