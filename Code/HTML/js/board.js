@@ -1,6 +1,6 @@
 const BOARD_HEIGHT = 5;
 const BOARD_WIDTH = 9;
-const GAME_SERVER = "ws://127.0.0.1:9001";
+const GAME_SERVER = "ws://127.0.0.1:9002";
 
 function MessageBox(element) {
     this.element = element;
@@ -85,27 +85,32 @@ function GameConnection(address) {
 
     this.onBoardUpdateCallback = null;
     this.onErrorCallback = null;
+    this.onConnectedCallback = null;
 
+    this.connect = () => {
+        this.sock = new WebSocket(this.address);
+        this.sock.addEventListener("message", e => this.onMessage(JSON.parse(e.data)));
+        this.sock.addEventListener("open", e => this.onConnectedCallback());
+    }
     this.startGame = () => {
-        this.sock.send(JSON.stringify({ cmd: "start" }));
+        this.sock.send(JSON.stringify({ command: "start" }));
     }
     this.movePawn = (from, to) => {
-        this.sock.send(JSON.stringify({ cmd: "move", from, to }));
+        this.sock.send(JSON.stringify({ command: "move", from, to }));
     }
     this.onMessage = (msg) => {
-        if(msg.cmd === "board") {
+        if(msg.command === "board") {
             this.onBoardUpdateCallback(msg.board);
-        } else if(msg.cmd === "error") {
+        } else if(msg.command === "error") {
             this.onErrorCallback(msg.message);
         } else {
-            console.error("Unknown command: " + msg.cmd);
+            console.error("Unknown command: " + msg.command);
         }
     }
 
     this.onBoardUpdate = (callback) => this.onBoardUpdateCallback = callback;
     this.onError = (callback) => this.onErrorCallback = callback;
-
-    this.sock.addEventListener("message", e => this.onMessage(JSON.parse(e.data)));
+    this.onConnected = (callback) => this.onConnectedCallback = callback;
 }
 
 let mb = new MessageBox(document.getElementById("message"));
@@ -114,5 +119,9 @@ let gb = new GameBoard(document.getElementById("pawnTable"));
 let gc = new GameConnection(GAME_SERVER);
 gc.onBoardUpdate(board => gb.setPawnStates(board));
 gc.onError(message => mb.setError(message));
+gc.onConnected(() => {
+    gc.startGame();
+});
+gc.connect();
 
 //gb.setPawnStates([[2,2,2,1,1],[2,2,1,1,1],[2,2,2,1,1],[2,2,1,1,1],[2,2,0,1,1], [2,2,2,1,1],[2,2,1,1,1],[2,2,2,1,1],[2,2,1,1,1]]);

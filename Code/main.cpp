@@ -16,6 +16,8 @@ using websocketpp::lib::bind;
 #define KEY_COMMAND "command"
 #define CMD_ERROR "error"
 #define CMD_MOVE "move"
+#define CMD_BOARD "board"
+#define CMD_START "start"
 
 // pull out the type of messages sent by our config
 typedef server::message_ptr message_ptr;
@@ -27,22 +29,33 @@ json json_error(std::string error) {
         {"message", error}
     };
 }
+json json_board() {
+    int test_board[9][5] = {{2,2,2,1,1},{2,2,1,1,1},{2,2,2,1,1},{2,2,1,1,1},{2,2,0,1,1}, {2,2,2,1,1},{2,2,1,1,1},{2,2,2,1,1},{2,2,1,1,1}};
+    return {
+        {KEY_COMMAND, CMD_BOARD},
+        {"board", test_board}
+    };
+}
 
 json process_command(json& message) {
     if(!message.contains(KEY_COMMAND)){
         // no command, no bueno
-        return json_error("you fucked up");
+        return json_error("Missing command in message");
     }
+    std::string cmd = message[KEY_COMMAND].get<std::string>();
+    if(cmd == CMD_START) {
+        std::cout << "start command" << std::endl;
+        return json_board();
+    }
+    return json_error("Not a recognized command");
 }
 // Define a callback to handle incoming messages
 void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
-    std::cout << "on_message called with hdl: " << hdl.lock().get()
-              << " and message: " << msg->get_payload()
-              << std::endl;
+    std::cout << msg->get_payload() << std::endl;
     
     // Parse command as JSON and process
     auto message = json::parse(msg->get_payload());
-    std::string resp = process_command(message);
+    std::string resp = process_command(message).dump();
 
     try {
         s->send(hdl, resp, msg->get_opcode());
