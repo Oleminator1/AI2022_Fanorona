@@ -3,7 +3,7 @@
 #pawnTable {
     width:inherit;
     height:inherit;
-    background-image:url(../Image/layout.jpg);
+    background-image:url(../img/layout.jpg);
     background-size:820px 400px;
     background-repeat:no-repeat;
     background-position: 75px 75px;
@@ -17,8 +17,21 @@
     border-width: 0px;
     border-radius: 50px;
     background-color: #FFF;
+    cursor: pointer;
+}
+.pawn:hover {
+    background-color: #f0f0f0;
+}
+.pawn-player1 {
+    background-image:url(../img/pawn-white.svg);
+    background-size: cover;
+}
+.pawn-player2 {
+    background-image:url(../img/pawn-black.svg);
+    background-size: cover;
 }
 
+/* ??? */
 .player1 {
     background-color:#F33;
 }
