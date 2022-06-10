@@ -181,7 +181,7 @@ void evaluatePlayerStones(int player, int grid[5][9])
                 strongPosition = false;
             }
             // Check if stone has empty neighbours
-            if (emptyNeighbours(row, column, strongPosition) == false)
+            if (emptyNeighbours(grid, row, column, strongPosition) == false)
             {
                 continue;
             }
