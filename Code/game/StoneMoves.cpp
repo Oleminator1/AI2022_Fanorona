@@ -4,6 +4,7 @@
 
 using namespace std;
 
+
 void initializeGrid(int grid[5][9])
 {
     // Fill the empty grid with stones
@@ -55,21 +56,21 @@ void printGrid(int grid_[5][9])
 bool isStrongPosition(int row, int col)
 // Check if stone has a strong or weak position
 {
-    if ((row%2) == 0) {
-        if ((col%2) == 0) {
+    if ((row % 2) == 0) {
+        if ((col % 2) == 0) {
             return true;
         }
         else {
             return false;
-        }        
+        }
     }
     else {
-        if ((col%2) == 0) {
+        if ((col % 2) == 0) {
             return false;
         }
         else {
             return true;
-        }       
+        }
     }
 }
 
@@ -78,42 +79,42 @@ bool emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition)
     int count = 0;
     if (strongPosition) {
         //check 3x3 Nhood
-        for (int i = row-1; i < row+2; i++) {
+        for (int i = row - 1; i < row + 2; i++) {
             if ((i < 0) || (i > 8)) {
                 //Out of bounds
                 continue;
             }
-            for (int j = col-1; j < col+2; j++) {
+            for (int j = col - 1; j < col + 2; j++) {
                 if ((j < 0) || (j > 4)) {
                     //Out of bounds
                     continue;
                 }
                 if (grid[i][j] == 0) {
-                    count += 1;   
+                    count += 1;
                 }
             }
         }
-    }                
+    }
     else {
         //Check cross Nhood
-        if ((row-1 >= 0) && (grid[row-1][col] == 0)) {
-            count += 1;   
+        if ((row - 1 >= 0) && (grid[row - 1][col] == 0)) {
+            count += 1;
         }
-        
-        if ((col-1 >= 0) && (grid[row][col-1] == 0)) {
-            count += 1;   
+
+        if ((col - 1 >= 0) && (grid[row][col - 1] == 0)) {
+            count += 1;
         }
-        
-        if ((col+1 <= 8) && (grid[row][col+1] == 0)) {
-            count += 1;   
+
+        if ((col + 1 <= 8) && (grid[row][col + 1] == 0)) {
+            count += 1;
         }
-        
-        if ((row+1 <= 4) && (grid[row+1][col] == 0)) {
-            count += 1;   
+
+        if ((row + 1 <= 4) && (grid[row + 1][col] == 0)) {
+            count += 1;
         }
     }
-    
-    
+
+
     if (count > 0) {
         return true;
     }
@@ -140,7 +141,7 @@ void showPossibleStones(vector<vector<int>> possibleMoves)
 }
 
 
-void evaluatePlayerStones(int player, int grid[5][9])
+void EvaluatePlayerStones(int player, int grid[5][9])
 {
     // Evaluate all possibilites for the player
     bool strongPosition;
@@ -208,7 +209,7 @@ int getDirection(int x1, int y1, int x2, int y2)
     if (x2 < x1 && y2 == y1) { return 8; }
 }
 
-void clear_diagonal(int grid[5][9], int direction, int row_2, int col_2, int player) 
+void clear_diagonal(int grid[5][9], int direction, int row_2, int col_2, int player)
 {
     if (direction == 1) {
         while (1) {
@@ -223,10 +224,10 @@ void clear_diagonal(int grid[5][9], int direction, int row_2, int col_2, int pla
             else {
                 break;
             }
-         
+
         }
     }
-   if (direction == 3) {
+    if (direction == 3) {
         while (1) {
             row_2 += 1;
             col_2 += 1;
@@ -257,27 +258,27 @@ void clear_diagonal(int grid[5][9], int direction, int row_2, int col_2, int pla
         }
     }
     if (direction == 7) {
-        while (1)) {
-            row_2 -= 1;
-            col_2 -= 1;
-            if ((row_2 == -1) || (col_2 == -1)) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
+        while (1) {
+        row_2 -= 1;
+        col_2 -= 1;
+        if ((row_2 == -1) || (col_2 == -1)) {
+            break;
+        }
+        if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
+            grid[row_2][col_2] = 0;
+        }
+        else {
+            break;
+        }
         }
     }
     return;
 }
 
-void clear_horizontal(int grid[5][9], int direction, int row_2, int col_2, int player) 
+void clear_horizontal(int grid[5][9], int direction, int row_2, int col_2, int player)
 {
     if (direction == 2) {
-        while (1) 
+        while (1) {
             col_2 += 1;
             if (col_2 == 9) {
                 break;
@@ -306,8 +307,8 @@ void clear_horizontal(int grid[5][9], int direction, int row_2, int col_2, int p
     }
     return;
 }
-                
-void clear_vertical(int grid[5][9], int direction, int row_2, int col_2, int player) 
+
+void clear_vertical(int grid[5][9], int direction, int row_2, int col_2, int player)
 {
     if (direction == 4) {
         while (1) {
@@ -340,30 +341,30 @@ void clear_vertical(int grid[5][9], int direction, int row_2, int col_2, int pla
     return;
 }
 
-
 void moveStone(int x1, int y1, int x2, int y2, int grid[5][9])
 {
     // x1, y1 are the old and x2, y2 the new position
     grid[x2][y2] = grid[x1][y1];
     grid[x1][y1] = 0;
-    int dir = getDirection(x1, y1, x2, y2, grid);
-    if ( (dir%2) != 0 ) {
+    int dir = getDirection(x1, y1, x2, y2);
+    if ((dir % 2) != 0) {
         clear_diagonal(grid, dir, x2, y2, grid[x2][y2]);
     }
     else {
-        if ( (dir%4) == 0 ) {
+        if ((dir % 4) == 0) {
             clear_vertical(grid, dir, x2, y2, grid[x2][y2]);
         }
         else {
             clear_horizontal(grid, dir, x2, y2, grid[x2][y2]);
         }
+    }
 }
 
-                    
+
 int main()
 {
     int grid[5][9];
-    int player = 1;
+    int player = 2;
 
     // Fill the empty grid with stones
     initializeGrid(grid);
@@ -373,14 +374,13 @@ int main()
 
     // Evaluate all possibilites for the player
     EvaluatePlayerStones(player, grid);
-    
+
     // Move stone from former to new position
-    moveStone(1, 1, 2, 2, grid);
+    moveStone(3, 5, 2, 4, grid);
 
     // Print the grid in the console
     printGrid(grid);
 
     // Get direction of movement
     cout << getDirection(1, 1, 2, 2);
-   
 }
