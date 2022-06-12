@@ -1,4 +1,50 @@
-  //Functions to Implement:
+#ifndef _STONEMOVES_H
+#define _STONEMOVES_H
+
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+
+class MoveGenerator {
+  private:
+    /*Board ? ->  Any global constants*/
+    int test = 0;
+
+  public:
+    /*Getter for Board?*/
+  
+    /*Constructor, Destructor required?*/
+
+    void MoveGenerator::initializeGrid(int grid[5][9]);
+
+    void MoveGenerator::printGrid(int grid_[5][9]);
+
+    bool MoveGenerator::isStrongPosition(int row, int col);
+
+    bool MoveGenerator::emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition);
+
+    void MoveGenerator::capturingMoves(int X, int Y, bool strongPosition, vector<vector<int>> captureList, vector<vector<int>> moveList);
+
+    void MoveGenerator::showPossibleStones(vector<vector<int>> possibleMoves);
+
+    void MoveGenerator::evaluatePlayerStones(int player, int grid[5][9]); 
+
+    void MoveGenerator::moveStone(int x1, int y1, int x2, int y2, int grid[5][9]);
+
+    int MoveGenerator::getDirection(int x1, int y1, int x2, int y2);
+  
+    /*Extend list as sson as function is implemented!*/
+  
+};
+
+#endif
+
+
+/*
+
+//Functions to Implement:
     MoveGenerator::generate()
          //applies the evaluation functions and provides a list of possible moves for the selected stone.
 
@@ -93,3 +139,4 @@ Use Case  3: Making a move
                 //evaluate if there are more valid moves from current position
                 //bool to continue and make move or to break and end turn
 
+*/
