@@ -37,6 +37,8 @@ class MoveGenerator {
 
     int getDirection(int x1, int y1, int x2, int y2);
     
+    void clear_diagonal(int grid[5][9], int direction, int row_2, int col_2, int player);
+    
     void clear_horizontal(int grid[5][9], int direction, int row_2, int col_2, int player);
   
     void clear_vertical(int grid[5][9], int direction, int row_2, int col_2, int player);
