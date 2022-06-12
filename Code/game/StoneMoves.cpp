@@ -1,4 +1,4 @@
-
+#include "StoneMoves.h"
 #include <iostream>
 #include <vector>
 
