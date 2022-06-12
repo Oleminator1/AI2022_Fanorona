@@ -238,6 +238,52 @@ int getDirection(int x1, int y1, int x2, int y2)
     if (x2 < x1 && y2 == y1) { return 8; }
 }
 
+void clear_horizontal(int grid[5][9], int direction, int row_2, int col_2, int player) 
+{
+    if (direction == 2) {
+        while ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
+            grid[row_2][col_2] = 0;
+            col_2 += 1;
+            if (col_2 == 9) {
+                break;
+            }
+        }
+    }
+    if (direction == 6) {
+        while ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
+            grid[row_2][col_2] = 0;
+            col_2 -= 1;
+            if (col_2 == -1) {
+                break;
+            }
+        }
+    }
+    return;
+}
+                
+void clear_vertical(int grid[5][9], int direction, int row_2, int col_2, int player) 
+{
+    if (direction == 4) {
+        while ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
+            grid[row_2][col_2] = 0;
+            row_2 += 1;
+            if (row_2 == 5) {
+                break;
+            }
+        }
+    }
+    if (direction == 8) {
+        while ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
+            grid[row_2][col_2] = 0;
+            row_2 -= 1;
+            if (row_2 == -1) {
+                break;
+            }
+        }
+    }
+    return;
+}
+
                     
 int main()
 {
