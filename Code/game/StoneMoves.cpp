@@ -79,18 +79,20 @@ bool emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition)
     if (strongPosition) {
         //check 3x3 Nhood
         for (int i = row-1; i < row+2; i++) {
-            if ((i < 0 or i > 8) {
+            if ((i < 0) or (i > 8)) {
                 //Out of bounds
                 continue;
             }
             for (int j = col-1; j < col+2; j++) {
-                if ((j < 0 or j > 4) {
+                if ((j < 0) or (j > 4)) {
                     //Out of bounds
                     continue;
                 }
                 if (grid[i][j] == 0) {
                     count += 1;   
                 }
+            }
+        }
     }
                     
     else {
@@ -205,7 +207,38 @@ void evaluatePlayerStones(int player, int grid[5][9])
         showPossibleStones(moveList);
     }
 }
+      
+                    
+void moveStone(int x1, int y1, int x2, int y2, int grid[5][9])
+{
+    // x1, y1 are the old and x2, y2 the new position
+    grid[x2][y2] = grid[x1][y1];
+    grid[x1][y1] = 0;
+}
 
+
+int getDirection(int x1, int y1, int x2, int y2)
+{
+    // return direction of movement
+    // upper right
+    if (x2 < x1 && y2 > y1) { return 1; }
+    // right
+    if (x2 == x1 && y2 > y1) { return 2; }
+    // lower right
+    if (x2 > x1 && y2 > y1) { return 3; }
+    // bottom
+    if (x2 > x1 && y2 == y1) { return 4; }
+    // lower left
+    if (x2 > x1 && y2 < y1) { return 5; }
+    // left
+    if (x2 == x1 && y2 < y1) { return 6; }
+    // upper left
+    if (x2 < x1 && y2 < y1) { return 7; }
+    // top
+    if (x2 < x1 && y2 == y1) { return 8; }
+}
+
+                    
 int main()
 {
     int grid[5][9];
@@ -219,5 +252,14 @@ int main()
 
     // Evaluate all possibilites for the player
     EvaluatePlayerStones(player, grid);
+    
+    // Move stone from former to new position
+    moveStone(1, 1, 2, 2, grid);
+
+    // Print the grid in the console
+    printGrid(grid);
+
+    // Get direction of movement
+    cout << getDirection(1, 1, 2, 2);
    
 }
