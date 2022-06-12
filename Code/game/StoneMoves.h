@@ -17,23 +17,23 @@ class MoveGenerator {
   
     /*Constructor, Destructor required?*/
 
-    void MoveGenerator::initializeGrid(int grid[5][9]);
+    void initializeGrid(int grid[5][9]);
 
-    void MoveGenerator::printGrid(int grid_[5][9]);
+    void printGrid(int grid_[5][9]);
 
-    bool MoveGenerator::isStrongPosition(int row, int col);
+    bool isStrongPosition(int row, int col);
 
-    bool MoveGenerator::emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition);
+    bool emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition);
 
-    void MoveGenerator::capturingMoves(int X, int Y, bool strongPosition, vector<vector<int>> captureList, vector<vector<int>> moveList);
+    void capturingMoves(int X, int Y, bool strongPosition, vector<vector<int>> captureList, vector<vector<int>> moveList);
 
-    void MoveGenerator::showPossibleStones(vector<vector<int>> possibleMoves);
+    void showPossibleStones(vector<vector<int>> possibleMoves);
 
-    void MoveGenerator::evaluatePlayerStones(int player, int grid[5][9]); 
+    void evaluatePlayerStones(int player, int grid[5][9]); 
 
-    void MoveGenerator::moveStone(int x1, int y1, int x2, int y2, int grid[5][9]);
+    void moveStone(int x1, int y1, int x2, int y2, int grid[5][9]);
 
-    int MoveGenerator::getDirection(int x1, int y1, int x2, int y2);
+    int getDirection(int x1, int y1, int x2, int y2);
   
     /*Extend list as sson as function is implemented!*/
   
