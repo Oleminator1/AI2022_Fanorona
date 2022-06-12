@@ -93,48 +93,27 @@ bool emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition)
                 }
             }
         }
-    }
-                    
+    }                
     else {
         //Check cross Nhood
-        if (row-1 < 0) {
-            //Out of bounds
-            continue;
-        }
-        else {
-            if (grid[row-1][col] == 0) {
-                    count += 1;   
-            }
-        }
-        if (col-1 < 0) {
-            //Out of bounds
-            continue;
-        }
-        else {
-            if (grid[row][col-1] == 0) {
-                    count += 1;   
-            }
-        }
-        if (col+1 > 8) {
-            //Out of bounds
-            continue;
-        }
-        else {
-            if (grid[row][col+1] == 0) {
-                    count += 1;   
-            }
-        }
-        if (row+1 > 4) {
-            //Out of bounds
-            continue;
-        }
-        else {
-            if (grid[row+1][col] == 0) {
-                    count += 1;   
-            }
+        if ((row-1 >= 0) && (grid[row-1][col] == 0)) {
+            count += 1;   
         }
         
+        if ((col-1 >= 0) && (grid[row][col-1] == 0)) {
+            count += 1;   
+        }
+        
+        if ((col+1 <= 8) && (grid[row][col+1] == 0)) {
+            count += 1;   
+        }
+        
+        if ((row+1 <= 4) && (grid[row+1][col] == 0)) {
+            count += 1;   
+        }
     }
+    
+    
     if (count > 0) {
         return true;
     }
