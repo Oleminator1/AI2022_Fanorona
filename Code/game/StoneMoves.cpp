@@ -79,12 +79,12 @@ bool emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition)
     if (strongPosition) {
         //check 3x3 Nhood
         for (int i = row-1; i < row+2; i++) {
-            if ((i < 0) or (i > 8)) {
+            if ((i < 0) || (i > 8)) {
                 //Out of bounds
                 continue;
             }
             for (int j = col-1; j < col+2; j++) {
-                if ((j < 0) or (j > 4)) {
+                if ((j < 0) || (j > 4)) {
                     //Out of bounds
                     continue;
                 }
@@ -236,6 +236,51 @@ int getDirection(int x1, int y1, int x2, int y2)
     if (x2 < x1 && y2 < y1) { return 7; }
     // top
     if (x2 < x1 && y2 == y1) { return 8; }
+}
+
+void clear_diagonal(int grid[5][9], int direction, int row_2, int col_2, int player) 
+{
+    if (direction == 1) {
+        while ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
+            grid[row_2][col_2] = 0;
+            row_2 -= 1;
+            col_2 += 1;
+            if ((row_2 == -1) || (col_2 == 9)) {
+                break;
+            }
+        }
+    }
+   if (direction == 3) {
+        while ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
+            grid[row_2][col_2] = 0;
+            row_2 += 1;
+            col_2 += 1;
+            if ((row_2 == 5) || (col_2 == 9)) {
+                break;
+            }
+        }
+    }
+    if (direction == 5) {
+        while ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
+            grid[row_2][col_2] = 0;
+            row_2 += 1;
+            col_2 -= 1;
+            if ((row_2 == 5) || (col_2 == -1)) {
+                break;
+            }
+        }
+    }
+    if (direction == 7) {
+        while ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
+            grid[row_2][col_2] = 0;
+            row_2 -= 1;
+            col_2 -= 1;
+            if ((row_2 == -1) || (col_2 == -1)) {
+                break;
+            }
+        }
+    }
+    return;
 }
 
 void clear_horizontal(int grid[5][9], int direction, int row_2, int col_2, int player) 
