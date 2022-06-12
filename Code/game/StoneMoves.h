@@ -11,7 +11,9 @@ class MoveGenerator {
   private:
     /*Board ? ->  Any global constants*/
     int test = 0;
-
+    //int grid[5][9] = 0;
+    //MoverGenerator::grid as function arg?  
+  
   public:
     /*Getter for Board?*/
   
@@ -34,6 +36,10 @@ class MoveGenerator {
     void moveStone(int x1, int y1, int x2, int y2, int grid[5][9]);
 
     int getDirection(int x1, int y1, int x2, int y2);
+    
+    void clear_horizontal(int grid[5][9], int direction, int row_2, int col_2, int player);
+  
+    void clear_vertical(int grid[5][9], int direction, int row_2, int col_2, int player);
   
     /*Extend list as sson as function is implemented!*/
   
