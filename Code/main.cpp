@@ -19,6 +19,8 @@ using websocketpp::lib::bind;
 #define CMD_BOARD "board"
 #define CMD_START "start"
 
+#define SERVER_PORT 9002
+
 // pull out the type of messages sent by our config
 typedef server::message_ptr message_ptr;
 
@@ -28,44 +30,44 @@ int board_start[9][5] = {{2,2,2,1,1},{2,2,1,1,1},{2,2,2,1,1},{2,2,1,1,1},{2,2,0,
 int test_board[9][5];
 
 FanoronaGame game;
-json json_error(std::string error) {
+json jsonError(std::string error) {
     return {
         {KEY_COMMAND, CMD_ERROR},
         {"message", error}
     };
 }
-json json_board() {
+json jsonBoard() {
     return {
         {KEY_COMMAND, CMD_BOARD},
         {"board", test_board}
     };
 }
 
-json process_command(json& message) {
+json processCommand(json& message) {
     if(!message.contains(KEY_COMMAND)){
         // no command, no bueno
-        return json_error("Missing command in message");
+        return jsonError("Missing command in message");
     }
     std::string cmd = message[KEY_COMMAND].get<std::string>();
     if(cmd == CMD_START) {
         std::copy(&board_start[0][0], &board_start[0][0]+9*5,&test_board[0][0]);
-        return json_board();
+        return jsonBoard();
     } else if (cmd == CMD_MOVE) {
         position from = { message["from"]["x"].get<int>(), message["from"]["y"].get<int>() };
         position to = { message["to"]["x"].get<int>(), message["to"]["y"].get<int>() };
         test_board[to.x][to.y] = test_board[from.x][from.y];
         test_board[from.x][from.y] = 0;
-        return json_board();
+        return jsonBoard();
     }
-    return json_error("Not a recognized command");
+    return jsonError("Not a recognized command");
 }
 // Define a callback to handle incoming messages
-void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
+void onMessage(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
     std::cout << msg->get_payload() << std::endl;
     
     // Parse command as JSON and process
     auto message = json::parse(msg->get_payload());
-    std::string resp = process_command(message).dump();
+    std::string resp = processCommand(message).dump();
 
     try {
         s->send(hdl, resp, msg->get_opcode());
@@ -88,15 +90,16 @@ int main() {
         echo_server.init_asio();
 
         // Register our message handler
-        echo_server.set_message_handler(bind(&on_message,&echo_server,::_1,::_2));
+        echo_server.set_message_handler(bind(&onMessage,&echo_server,::_1,::_2));
 
         // Listen on port 9002
-        echo_server.listen(9002);
+        echo_server.listen(SERVER_PORT);
 
         // Start the server accept loop
         echo_server.start_accept();
 
         // Start the ASIO io_service run loop
+        std::cout << "Server is ready at ws://127.0.0.1:" << std::to_string(SERVER_PORT) << std::endl;
         echo_server.run();
     } catch (websocketpp::exception const & e) {
         std::cout << e.what() << std::endl;
