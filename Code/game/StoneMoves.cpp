@@ -141,7 +141,7 @@ void showPossibleStones(vector<vector<int>> possibleMoves)
 }
 
 
-void EvaluatePlayerStones(int player, int grid[5][9])
+void evaluatePlayerStones(int player, int grid[5][9])
 {
     // Evaluate all possibilites for the player
     bool strongPosition;
@@ -207,9 +207,11 @@ int getDirection(int x1, int y1, int x2, int y2)
     if (x2 < x1 && y2 < y1) { return 7; }
     // top
     if (x2 < x1 && y2 == y1) { return 8; }
+    // default case
+    return -1;
 }
 
-void clear_diagonal(int grid[5][9], int direction, int row_2, int col_2, int player)
+void clearDiagonal(int grid[5][9], int direction, int row_2, int col_2, int player)
 {
     if (direction == 1) {
         while (1) {
@@ -275,7 +277,7 @@ void clear_diagonal(int grid[5][9], int direction, int row_2, int col_2, int pla
     return;
 }
 
-void clear_horizontal(int grid[5][9], int direction, int row_2, int col_2, int player)
+void clearHorizontal(int grid[5][9], int direction, int row_2, int col_2, int player)
 {
     if (direction == 2) {
         while (1) {
@@ -308,7 +310,7 @@ void clear_horizontal(int grid[5][9], int direction, int row_2, int col_2, int p
     return;
 }
 
-void clear_vertical(int grid[5][9], int direction, int row_2, int col_2, int player)
+void clearVertical(int grid[5][9], int direction, int row_2, int col_2, int player)
 {
     if (direction == 4) {
         while (1) {
@@ -348,14 +350,14 @@ void moveStone(int x1, int y1, int x2, int y2, int grid[5][9])
     grid[x1][y1] = 0;
     int dir = getDirection(x1, y1, x2, y2);
     if ((dir % 2) != 0) {
-        clear_diagonal(grid, dir, x2, y2, grid[x2][y2]);
+        clearDiagonal(grid, dir, x2, y2, grid[x2][y2]);
     }
     else {
         if ((dir % 4) == 0) {
-            clear_vertical(grid, dir, x2, y2, grid[x2][y2]);
+            clearVertical(grid, dir, x2, y2, grid[x2][y2]);
         }
         else {
-            clear_horizontal(grid, dir, x2, y2, grid[x2][y2]);
+            clearHorizontal(grid, dir, x2, y2, grid[x2][y2]);
         }
     }
 }
