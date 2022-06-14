@@ -46,6 +46,7 @@ function GameBoard(table) {
     this.table = table;
     this.pawns = [];
     this.selectedPawn = null;
+    this.onPawnMoveCallback = null;
 
     this.setPawnStates = (pawnStates) => {
         for(let y = 0; y < BOARD_HEIGHT; y++) {
@@ -61,12 +62,15 @@ function GameBoard(table) {
         if(this.selectedPawn) {
             // Transfer state
             console.log("move from " + this.selectedPawn.x + ", "+ this.selectedPawn.y + " to " + pawn.x + ", "+ pawn.y);
+            this.onPawnMoveCallback({ x: this.selectedPawn.x, y: this.selectedPawn.y }, { x: pawn.x, y: pawn.y });
             this.selectedPawn = null;
         }else {
             this.selectedPawn = pawn;
         }
 
     }
+
+    this.onPawnMove = (callback) => this.onPawnMoveCallback = callback;
 
     for(let y = 0; y < BOARD_HEIGHT; y++) {
         let row = document.createElement("tr");
@@ -122,6 +126,11 @@ gc.onError(message => mb.setError(message));
 gc.onConnected(() => {
     gc.startGame();
 });
+
+gb.onPawnMove((from, to) => {
+    gc.movePawn(from, to);
+});
+
 gc.connect();
 
 //gb.setPawnStates([[2,2,2,1,1],[2,2,1,1,1],[2,2,2,1,1],[2,2,1,1,1],[2,2,0,1,1], [2,2,2,1,1],[2,2,1,1,1],[2,2,2,1,1],[2,2,1,1,1]]);

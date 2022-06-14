@@ -22,6 +22,11 @@ using websocketpp::lib::bind;
 // pull out the type of messages sent by our config
 typedef server::message_ptr message_ptr;
 
+struct position { int x; int y; };
+
+int board_start[9][5] = {{2,2,2,1,1},{2,2,1,1,1},{2,2,2,1,1},{2,2,1,1,1},{2,2,0,1,1}, {2,2,2,1,1},{2,2,1,1,1},{2,2,2,1,1},{2,2,1,1,1}};;
+int test_board[9][5];
+
 FanoronaGame game;
 json json_error(std::string error) {
     return {
@@ -30,7 +35,6 @@ json json_error(std::string error) {
     };
 }
 json json_board() {
-    int test_board[9][5] = {{2,2,2,1,1},{2,2,1,1,1},{2,2,2,1,1},{2,2,1,1,1},{2,2,0,1,1}, {2,2,2,1,1},{2,2,1,1,1},{2,2,2,1,1},{2,2,1,1,1}};
     return {
         {KEY_COMMAND, CMD_BOARD},
         {"board", test_board}
@@ -44,7 +48,13 @@ json process_command(json& message) {
     }
     std::string cmd = message[KEY_COMMAND].get<std::string>();
     if(cmd == CMD_START) {
-        std::cout << "start command" << std::endl;
+        std::copy(&board_start[0][0], &board_start[0][0]+9*5,&test_board[0][0]);
+        return json_board();
+    } else if (cmd == CMD_MOVE) {
+        position from = { message["from"]["x"].get<int>(), message["from"]["y"].get<int>() };
+        position to = { message["to"]["x"].get<int>(), message["to"]["y"].get<int>() };
+        test_board[to.x][to.y] = test_board[from.x][from.y];
+        test_board[from.x][from.y] = 0;
         return json_board();
     }
     return json_error("Not a recognized command");
