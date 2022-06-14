@@ -121,7 +121,7 @@ let mb = new MessageBox(document.getElementById("message"));
 let gb = new GameBoard(document.getElementById("pawnTable"));
 
 let gc = new GameConnection(GAME_SERVER);
-gc.onBoardUpdate(board => gb.setPawnStates(board));
+gc.onBoardUpdate(board => gb.setPawnStates(board[0].map((_, colIndex) => board.map(row => row[colIndex]))));
 gc.onError(message => mb.setError(message));
 gc.onConnected(() => {
     gc.startGame();
