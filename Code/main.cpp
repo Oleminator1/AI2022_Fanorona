@@ -5,7 +5,7 @@
 #include <websocketpp/server.hpp>
 
 #include <iostream>
-#include "game/fanorona-game.h"
+#include "game/FanoronaGame.h"
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 

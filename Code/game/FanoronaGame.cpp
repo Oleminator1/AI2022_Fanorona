@@ -1,4 +1,4 @@
-#include "fanorona-game.h"
+#include "FanoronaGame.h"
 
 json FanoronaGame::as_json() {
     json j;
