@@ -4,56 +4,14 @@
 
 using namespace std;
 
+MoveGenerator::MoveGenerator(const FanoronaGame* game) {
 
-void initializeGrid(int grid[5][9])
-{
-    // Fill the empty grid with stones
-    for (int row = 0; row < 5; row++) {
-        for (int column = 0; column < 9; column++) {
-            if (row == 0 || row == 1) {
-                grid[row][column] = 1;
-            }
-            else if (row == 2) {
-                if ((column % 2 == 1 && column < 5) || (column % 2 == 0 && column > 5)) {
-                    grid[row][column] = 1;
-                }
-                else if (column != 4) {
-                    grid[row][column] = 2;
-                }
-                else {
-                    grid[row][column] = 0;
-                }
-            }
-            else if (row == 3 || row == 4) {
-                grid[row][column] = 2;
-            }
-        }
-    }
+}
+Move MoveGenerator::nextMove() {
+    return AI_INFINITE;
 }
 
-void printGrid(int grid_[5][9])
-{
-    // Print the grid in the console
-    for (int row = 0; row < 5; row++) {
-        for (int column = 0; column < 9; column++) {
-            cout << grid_[row][column];
-            if (column < 8) {
-                cout << " - ";
-            }
-            if (column == 8) {
-                cout << endl;
-                if (row == 0 || row == 2) {
-                    cout << "| \\ | / | \\ | / | \\ | / | \\ | / |" << endl;
-                }
-                else if (row == 1 || row == 3) {
-                    cout << "| / | \\ | / | \\ | / | \\ | / | \\ |" << endl;
-                }
-            }
-        }
-    }
-}
-
-bool isStrongPosition(int row, int col)
+bool MoveGenerator::isStrongPosition(int row, int col)
 // Check if stone has a strong or weak position
 {
     if ((row % 2) == 0) {
@@ -74,7 +32,7 @@ bool isStrongPosition(int row, int col)
     }
 }
 
-bool emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition)
+bool MoveGenerator::emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition)
 {
     int count = 0;
     if (strongPosition) {
@@ -123,12 +81,12 @@ bool emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition)
     }
 }
 
-void capturingMoves(int X, int Y, bool strongPosition, vector<vector<int>> captureList, vector<vector<int>> moveList)
+void MoveGenerator::capturingMoves(int X, int Y, bool strongPosition, vector<vector<int>> captureList, vector<vector<int>> moveList)
 {
     // Store capturing and simple movements in lists
 }
 
-void showPossibleStones(vector<vector<int>> possibleMoves)
+void MoveGenerator::showPossibleStones(vector<vector<int>> possibleMoves)
 {
     // Print either all stones that can perform capturing or simple moves on the console
     cout << "Select your next stone" << endl;
@@ -141,7 +99,7 @@ void showPossibleStones(vector<vector<int>> possibleMoves)
 }
 
 
-void evaluatePlayerStones(int player, int grid[5][9])
+void MoveGenerator::evaluatePlayerStones(int player, int grid[5][9])
 {
     // Evaluate all possibilites for the player
     bool strongPosition;
@@ -187,181 +145,6 @@ void evaluatePlayerStones(int player, int grid[5][9])
         showPossibleStones(moveList);
     }
 }
-
-int getDirection(int x1, int y1, int x2, int y2)
-{
-    // return direction of movement
-    // upper right
-    if (x2 < x1 && y2 > y1) { return 1; }
-    // right
-    if (x2 == x1 && y2 > y1) { return 2; }
-    // lower right
-    if (x2 > x1 && y2 > y1) { return 3; }
-    // bottom
-    if (x2 > x1 && y2 == y1) { return 4; }
-    // lower left
-    if (x2 > x1 && y2 < y1) { return 5; }
-    // left
-    if (x2 == x1 && y2 < y1) { return 6; }
-    // upper left
-    if (x2 < x1 && y2 < y1) { return 7; }
-    // top
-    if (x2 < x1 && y2 == y1) { return 8; }
-    // default case
-    return -1;
-}
-
-void clearDiagonal(int grid[5][9], int direction, int row_2, int col_2, int player)
-{
-    if (direction == 1) {
-        while (1) {
-            row_2 -= 1;
-            col_2 += 1;
-            if ((row_2 == -1) || (col_2 == 9)) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-
-        }
-    }
-    if (direction == 3) {
-        while (1) {
-            row_2 += 1;
-            col_2 += 1;
-            if ((row_2 == 5) || (col_2 == 9)) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    if (direction == 5) {
-        while (1) {
-            row_2 += 1;
-            col_2 -= 1;
-            if ((row_2 == 5) || (col_2 == -1)) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    if (direction == 7) {
-        while (1) {
-        row_2 -= 1;
-        col_2 -= 1;
-        if ((row_2 == -1) || (col_2 == -1)) {
-            break;
-        }
-        if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-            grid[row_2][col_2] = 0;
-        }
-        else {
-            break;
-        }
-        }
-    }
-    return;
-}
-
-void clearHorizontal(int grid[5][9], int direction, int row_2, int col_2, int player)
-{
-    if (direction == 2) {
-        while (1) {
-            col_2 += 1;
-            if (col_2 == 9) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    if (direction == 6) {
-        while (1) {
-            col_2 -= 1;
-            if (col_2 == -1) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    return;
-}
-
-void clearVertical(int grid[5][9], int direction, int row_2, int col_2, int player)
-{
-    if (direction == 4) {
-        while (1) {
-            row_2 += 1;
-            if (row_2 == 5) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    if (direction == 8) {
-        while (1) {
-            row_2 -= 1;
-            if (row_2 == -1) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    return;
-}
-
-void moveStone(int x1, int y1, int x2, int y2, int grid[5][9])
-{
-    // x1, y1 are the old and x2, y2 the new position
-    grid[x2][y2] = grid[x1][y1];
-    grid[x1][y1] = 0;
-    int dir = getDirection(x1, y1, x2, y2);
-    if ((dir % 2) != 0) {
-        clearDiagonal(grid, dir, x2, y2, grid[x2][y2]);
-    }
-    else {
-        if ((dir % 4) == 0) {
-            clearVertical(grid, dir, x2, y2, grid[x2][y2]);
-        }
-        else {
-            clearHorizontal(grid, dir, x2, y2, grid[x2][y2]);
-        }
-    }
-}
-
 
 /*int main()
 {
