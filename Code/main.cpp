@@ -26,10 +26,8 @@ typedef server::message_ptr message_ptr;
 
 struct position { int x; int y; };
 
-int board_start[9][5] = {{2,2,2,1,1},{2,2,1,1,1},{2,2,2,1,1},{2,2,1,1,1},{2,2,0,1,1}, {2,2,2,1,1},{2,2,1,1,1},{2,2,2,1,1},{2,2,1,1,1}};;
-int test_board[9][5];
-
 FanoronaGame game;
+
 json jsonError(std::string error) {
     return {
         {KEY_COMMAND, CMD_ERROR},
@@ -39,7 +37,7 @@ json jsonError(std::string error) {
 json jsonBoard() {
     return {
         {KEY_COMMAND, CMD_BOARD},
-        {"board", test_board}
+        {"board", game.grid}
     };
 }
 
@@ -50,13 +48,14 @@ json processCommand(json& message) {
     }
     std::string cmd = message[KEY_COMMAND].get<std::string>();
     if(cmd == CMD_START) {
-        std::copy(&board_start[0][0], &board_start[0][0]+9*5,&test_board[0][0]);
+        game.initializeGrid();
         return jsonBoard();
     } else if (cmd == CMD_MOVE) {
+        // Convert the JSON values into more practical structs
         position from = { message["from"]["x"].get<int>(), message["from"]["y"].get<int>() };
         position to = { message["to"]["x"].get<int>(), message["to"]["y"].get<int>() };
-        test_board[to.x][to.y] = test_board[from.x][from.y];
-        test_board[from.x][from.y] = 0;
+        // Apply the move and return the board
+        game.moveStone(from.x, from.y, to.x, to.y);
         return jsonBoard();
     }
     return jsonError("Not a recognized command");

@@ -27,27 +27,27 @@ void FanoronaGame::moveStone(int x1, int y1, int x2, int y2)
         }
     }
 }
-int FanoronaGame::getDirection(int x1, int y1, int x2, int y2)
+Direction FanoronaGame::getDirection(int x1, int y1, int x2, int y2)
 {
     // return direction of movement
     // upper right
-    if (x2 < x1 && y2 > y1) { return 1; }
+    if (x2 < x1 && y2 > y1) { return Direction::UpperRight; }
     // right
-    if (x2 == x1 && y2 > y1) { return 2; }
+    if (x2 == x1 && y2 > y1) { return Direction::Right; }
     // lower right
-    if (x2 > x1 && y2 > y1) { return 3; }
+    if (x2 > x1 && y2 > y1) { return Direction::LowerRight; }
     // bottom
-    if (x2 > x1 && y2 == y1) { return 4; }
+    if (x2 > x1 && y2 == y1) { return Direction::Bottom; }
     // lower left
-    if (x2 > x1 && y2 < y1) { return 5; }
+    if (x2 > x1 && y2 < y1) { return Direction::LowerLeft; }
     // left
-    if (x2 == x1 && y2 < y1) { return 6; }
+    if (x2 == x1 && y2 < y1) { return Direction::Left; }
     // upper left
-    if (x2 < x1 && y2 < y1) { return 7; }
+    if (x2 < x1 && y2 < y1) { return Direction::UpperLeft; }
     // top
-    if (x2 < x1 && y2 == y1) { return 8; }
+    if (x2 < x1 && y2 == y1) { return Direction::Top; }
     // default case
-    return -1;
+    return Direction::Invalid;
 }
 
 void FanoronaGame::clearDiagonal(int direction, int row_2, int col_2, int player)
