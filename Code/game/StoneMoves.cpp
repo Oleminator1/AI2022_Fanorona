@@ -361,7 +361,7 @@ void moveStone(int x1, int y1, int x2, int y2, int grid[5][9])
 }
 
 
-int main()
+/*int main()
 {
     int grid[5][9];
     int player = 2;
@@ -383,4 +383,4 @@ int main()
 
     // Get direction of movement
     cout << getDirection(1, 1, 2, 2);
-}
+}*/

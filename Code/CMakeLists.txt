@@ -5,7 +5,7 @@ include(CTest)
 enable_testing()
 
 set(CMAKE_CXX_STANDARD 20)
-add_executable(fanorona-server main.cpp game/fanorona-game.cpp BoardGameWorld/WorldBoard.cpp BoardGameWorld/WorldUI.cpp)
+add_executable(fanorona-server main.cpp game/fanorona-game.cpp game/StoneMoves.cpp BoardGameWorld/worldBoard.cpp BoardGameWorld/worldUI.cpp BoardGameWorld/stones.cpp)
 
 include_directories(include)
 
