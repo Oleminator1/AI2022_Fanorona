@@ -32,46 +32,58 @@ bool MoveGenerator::isStrongPosition(int row, int col)
     }
 }
 
-bool MoveGenerator::emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition)
+bool MoveGenerator::capturingMoves(int grid[5][9], int row, int col, int X, int Y, int player)
 {
-    int count = 0;
-    if (strongPosition) {
-        //check 3x3 Nhood
-        for (int i = row - 1; i < row + 2; i++) {
-            if ((i < 0) || (i > 8)) {
-                //Out of bounds
-                continue;
-            }
-            for (int j = col - 1; j < col + 2; j++) {
-                if ((j < 0) || (j > 4)) {
-                    //Out of bounds
-                    continue;
-                }
-                if (grid[i][j] == 0) {
-                    count += 1;
-                }
-            }
-        }
+    // Check for capturing move
+    if ((grid[row + X * 2][col + Y * 2] != player) && (grid[row + X * 2][col + Y * 2] != 0)) {
+        return true;
     }
+    // Check for withdrawl move
+    else if ((grid[row + (X * -1)][col + (Y * -1)] != player) && (grid[row + (X * -1)][col + (Y * -1)] != 0)) {
+        return true;
+    }
+    // Only simple move possible
     else {
-        //Check cross Nhood
-        if ((row - 1 >= 0) && (grid[row - 1][col] == 0)) {
-            count += 1;
-        }
+        return false;
+    }
+}
 
-        if ((col - 1 >= 0) && (grid[row][col - 1] == 0)) {
-            count += 1;
-        }
+bool MoveGenerator::emptyNeighbours(int grid[5][9], int row, int col, vector<vector<int>>& captureList, vector<vector<int>>& moveList, int player, bool strongPosition)
+{
+     int count = 0;
+    // First 4 values for cross Nhood, last four for diagnoals
+    int row_neighbours[] = { 0, 0, -1, +1, -1, -1, +1, +1 };
+    int col_neighbours[] = {-1, +1, 0, 0, -1, +1, -1, +1  };
 
-        if ((col + 1 <= 8) && (grid[row][col + 1] == 0)) {
-            count += 1;
+    for (int i = 0; i < 9; i++) {
+        if (strongPosition == false && i > 3) {
+            // Stops loop if stone is not in strong position
+            break;
         }
-
-        if ((row + 1 <= 4) && (grid[row + 1][col] == 0)) {
+        if (((row + row_neighbours[i]) < 0) || ((row + row_neighbours[i]) > 8)) {
+        // Row is out of bounds
+            continue;
+        }
+        else if (((col + col_neighbours[i]) < 0) || ((col + col_neighbours[i]) > 8)) {
+            // Column is out of bounds
+            continue;
+        }
+        else if (grid[row+row_neighbours[i]][col+col_neighbours[i]] == 0) {
+            // Add Stone to list for possible moves
             count += 1;
+            vector<int> v1;
+            v1.push_back(row);
+            v1.push_back(col);
+            if (capturingMoves(grid, row, col, row_neighbours[i], col_neighbours[i], player) == true) {
+                captureList.push_back(v1);
+                // Stop the loop if one entrance was done?
+            }
+            else {
+                moveList.push_back(v1);
+                // Only one entrance?
+            }
         }
     }
-
 
     if (count > 0) {
         return true;
@@ -79,11 +91,6 @@ bool MoveGenerator::emptyNeighbours(int grid[5][9], int row, int col, bool stron
     else {
         return false;
     }
-}
-
-void MoveGenerator::capturingMoves(int X, int Y, bool strongPosition, vector<vector<int>> captureList, vector<vector<int>> moveList)
-{
-    // Store capturing and simple movements in lists
 }
 
 void MoveGenerator::showPossibleStones(vector<vector<int>> possibleMoves)
