@@ -24,7 +24,7 @@ using websocketpp::lib::bind;
 // pull out the type of messages sent by our config
 typedef server::message_ptr message_ptr;
 
-struct position { int x; int y; };
+struct position { int row; int col; };
 
 FanoronaGame game;
 
@@ -52,10 +52,10 @@ json processCommand(json& message) {
         return jsonBoard();
     } else if (cmd == CMD_MOVE) {
         // Convert the JSON values into more practical structs
-        position from = { message["from"]["x"].get<int>(), message["from"]["y"].get<int>() };
-        position to = { message["to"]["x"].get<int>(), message["to"]["y"].get<int>() };
+        position from = { message["from"]["row"].get<int>(), message["from"]["col"].get<int>() };
+        position to = { message["to"]["row"].get<int>(), message["to"]["col"].get<int>() };
         // Apply the move and return the board
-        game.moveStone(from.x, from.y, to.x, to.y);
+        game.moveStone(from.row, from.col, to.row, to.col);
         return jsonBoard();
     }
     return jsonError("Not a recognized command");

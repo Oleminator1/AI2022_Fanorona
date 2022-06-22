@@ -21,7 +21,7 @@ function GamePawn(x, y) {
     this.onClickCallback = null;
 
     this.setState = (state) => {
-        if(state) { this.state = state; }
+        if(typeof(state) !== "undefined") { this.state = state; }
         this.element.className = "pawn " + this.getClass();
     }
 
@@ -62,7 +62,7 @@ function GameBoard(table) {
         if(this.selectedPawn) {
             // Transfer state
             console.log("move from " + this.selectedPawn.x + ", "+ this.selectedPawn.y + " to " + pawn.x + ", "+ pawn.y);
-            this.onPawnMoveCallback({ x: this.selectedPawn.x, y: this.selectedPawn.y }, { x: pawn.x, y: pawn.y });
+            this.onPawnMoveCallback({ row: this.selectedPawn.y, col: this.selectedPawn.x }, { row: pawn.y, col: pawn.x });
             this.selectedPawn = null;
         }else {
             this.selectedPawn = pawn;
