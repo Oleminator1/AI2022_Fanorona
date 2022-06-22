@@ -50,8 +50,15 @@ Direction FanoronaGame::getDirection(int x1, int y1, int x2, int y2)
     return Direction::Invalid;
 }
 
-void FanoronaGame::clearDiagonal(int direction, int row_2, int col_2, int player)
-{
+void FanoronaGame::clearDiagonal(int direction, bool attackType, int row_2, int col_2, int player)
+{   
+    if (attackType == false) {
+        if ((direction == 1) || (direction == 3)) {
+            direction += 4;
+        } else {
+            direction -= 4;
+        }
+    }
     if (direction == 1) {
         while (1) {
             row_2 -= 1;
@@ -116,8 +123,16 @@ void FanoronaGame::clearDiagonal(int direction, int row_2, int col_2, int player
     return;
 }
 
-void FanoronaGame::clearHorizontal(int direction, int row_2, int col_2, int player)
-{
+void FanoronaGame::clearHorizontal(int direction, bool attackType, int row_2, int col_2, int player)
+{   
+    if (attackType == false) {
+        if (direction == 2) {
+            direction += 4;
+        }
+        else {
+            direction -= 4;
+        }
+    }
     if (direction == 2) {
         while (1) {
             col_2 += 1;
@@ -149,8 +164,16 @@ void FanoronaGame::clearHorizontal(int direction, int row_2, int col_2, int play
     return;
 }
 
-void FanoronaGame::clearVertical(int direction, int row_2, int col_2, int player)
+void FanoronaGame::clearVertical(int direction, bool attackType=true, int row_2, int col_2, int player)
 {
+    if (attackType == false) {
+        if (direction == 4) {
+            direction += 4;
+        }
+        else {
+            direction -= 4;
+        }
+    } 
     if (direction == 4) {
         while (1) {
             row_2 += 1;
