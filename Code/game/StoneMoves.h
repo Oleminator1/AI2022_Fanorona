@@ -16,6 +16,7 @@ class MoveGenerator {
     /*Board ? ->  Any global constants*/
     int index;
     int test = 0;
+    const FanoronaGame* game;
     //int grid[5][9] = 0;
     //MoverGenerator::grid as function arg?  
   
@@ -23,7 +24,7 @@ class MoveGenerator {
     /*Getter for Board?*/
   
     /*Constructor, Destructor required?*/
-    MoveGenerator(const FanoronaGame* game);
+    MoveGenerator(const FanoronaGame* p_game);
 
     Move nextMove();
 

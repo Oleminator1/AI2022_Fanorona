@@ -4,8 +4,8 @@
 
 using namespace std;
 
-MoveGenerator::MoveGenerator(const FanoronaGame* game) {
-
+MoveGenerator::MoveGenerator(const FanoronaGame* p_game) {
+    game = p_game;
 }
 Move MoveGenerator::nextMove() {
     return AI_INFINITE;
