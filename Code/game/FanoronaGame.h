@@ -20,9 +20,9 @@ class FanoronaGame : BoardGame<FanoronaGame> {
         void initializeGrid();
         void moveStone(int x1, int y1, int x2, int y2);
         Direction getDirection(int x1, int y1, int x2, int y2);
-        void clearDiagonal(int direction, int row_2, int col_2, int player);
-        void clearHorizontal(int direction, int row_2, int col_2, int player);
-        void clearVertical(int direction, int row_2, int col_2, int player);
+        void clearDiagonal(int direction, bool attackType, int row_2, int col_2, int player);
+        void clearHorizontal(int direction, bool attackType, int row_2, int col_2, int player);
+        void clearVertical(int direction, bool attackType, int row_2, int col_2, int player);
 
         // AI Functions
         bool hasWon_impl() const;
