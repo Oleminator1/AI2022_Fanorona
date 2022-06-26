@@ -28,15 +28,7 @@ class MoveGenerator {
 
     Move nextMove();
 
-    bool isStrongPosition(int row, int col);
-
-    bool emptyNeighbours(int grid[5][9], int row, int col, bool strongPosition);
-
-    void capturingMoves(int X, int Y, bool strongPosition, vector<vector<int>> captureList, vector<vector<int>> moveList);
-
-    void showPossibleStones(vector<vector<int>> possibleMoves);
-
-    void evaluatePlayerStones(int player, int grid[5][9]); 
+    //void evaluatePlayerStones(int player, int grid[5][9]); 
   
     /*Extend list as sson as function is implemented!*/
   

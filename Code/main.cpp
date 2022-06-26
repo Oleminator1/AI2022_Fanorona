@@ -15,6 +15,7 @@ using websocketpp::lib::bind;
 
 #define KEY_COMMAND "command"
 #define CMD_ERROR "error"
+#define CMD_SELECT "select"
 #define CMD_MOVE "move"
 #define CMD_BOARD "board"
 #define CMD_START "start"
@@ -23,8 +24,6 @@ using websocketpp::lib::bind;
 
 // pull out the type of messages sent by our config
 typedef server::message_ptr message_ptr;
-
-struct position { int row; int col; };
 
 FanoronaGame game;
 
@@ -48,14 +47,24 @@ json processCommand(json& message) {
     }
     std::string cmd = message[KEY_COMMAND].get<std::string>();
     if(cmd == CMD_START) {
-        game.initializeGrid();
+        game.startGame();
         return jsonBoard();
+    } else if (cmd == CMD_SELECT) {
+        // Convert the JSON values into more practical structs
+        Position p = { message["position"]["row"].get<int>(), message["position"]["col"].get<int>() };
+        // Try to select the stone
+        try{ game.selectStone(p); } catch(const std::runtime_error& e) { return jsonError(e.what()); }
     } else if (cmd == CMD_MOVE) {
         // Convert the JSON values into more practical structs
-        position from = { message["from"]["row"].get<int>(), message["from"]["col"].get<int>() };
-        position to = { message["to"]["row"].get<int>(), message["to"]["col"].get<int>() };
-        // Apply the move and return the board
-        game.moveStone(from.row, from.col, to.row, to.col);
+        Position from = { message["from"]["row"].get<int>(), message["from"]["col"].get<int>() };
+        Position to = { message["to"]["row"].get<int>(), message["to"]["col"].get<int>() };
+        // Try to apply the move and return the board
+        try{
+            //game.moveStone(from.row, from.col, to.row, to.col);
+        } catch(const std::exception& e) {
+            return jsonError(e.what());
+        }
+        
         return jsonBoard();
     }
     return jsonError("Not a recognized command");

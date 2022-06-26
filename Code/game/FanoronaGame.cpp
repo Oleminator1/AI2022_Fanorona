@@ -6,60 +6,77 @@ int FanoronaGame::STARTING_GRID[5][9] = {{ 1, 1, 1, 1, 1, 1, 1, 1, 1 },
                                          { 2, 2, 2, 2, 2, 2, 2, 2, 2 },
                                          { 2, 2, 2, 2, 2, 2, 2, 2, 2 }};
 
-void FanoronaGame::initializeGrid() {
+void FanoronaGame::startGame() {
+    // set the board to the starting configuration
     std::copy(&FanoronaGame::STARTING_GRID[0][0], &FanoronaGame::STARTING_GRID[0][0]+5*9, &grid[0][0]);
+    // player 1 starts
+    currentPlayer = PLAYER_WHITE;
 }
-void FanoronaGame::moveStone(int x1, int y1, int x2, int y2)
+std::vector<Movement> FanoronaGame::selectStone(Position pos) {
+    // Verify the stone is of the current player
+    if(at(pos) != currentPlayer) throw std::runtime_error("Cannot select an empty stone or stone of the non-current player");
+    // Verify the stone is moveable
+    auto movements = generateMovements(pos.row, pos.col, currentPlayer);
+    if(movements.size() == 0) throw std::runtime_error("Cannot select a stone with no possible movements");
+    // Return the list of possible movements straight away, while we have it
+    return movements;
+}
+void FanoronaGame::moveStone(Movement m)
 {
-    // x1, y1 are the old and x2, y2 the new position
-    grid[x2][y2] = grid[x1][y1];
-    grid[x1][y1] = 0;
-    int dir = getDirection(x1, y1, x2, y2);
+    // Verify the stone at position 1 is of the current player
+    if(grid[m.from.row][m.from.col] != currentPlayer) throw std::runtime_error("Cannot move a piece of the non-current player");
+    // Verify we're moving exactly one position
+    if(abs(m.from.row - m.to.row) + abs(m.from.col - m.to.col) != 1) throw std::runtime_error("Pieces must be moved exactly one position");
+    // row1, col1 are the old and row2, col2 the new position
+    // assign the new positions
+    grid[m.to.row][m.to.col] = grid[m.from.row][m.from.col];
+    grid[m.from.row][m.from.col] = 0;
+    int dir = getDirection(m.from, m.to);
     if ((dir % 2) != 0) {
-        clearDiagonal(dir, x2, y2, grid[x2][y2]);
+        clearDiagonal(dir, m.attackType, m.to.row, m.to.col, currentPlayer);
     }
     else {
         if ((dir % 4) == 0) {
-            clearVertical(dir, x2, y2, grid[x2][y2]);
+            clearVertical(dir, m.attackType, m.to.row, m.to.col, currentPlayer);
         }
         else {
-            clearHorizontal(dir, x2, y2, grid[x2][y2]);
+            clearHorizontal(dir, m.attackType, m.to.row, m.to.col, currentPlayer);
         }
     }
 }
-Direction FanoronaGame::getDirection(int x1, int y1, int x2, int y2)
+Direction FanoronaGame::getDirection(Position from, Position to)
 {
     // return direction of movement
     // upper right
-    if (x2 < x1 && y2 > y1) { return Direction::UpperRight; }
+    if (to.row < from.row && to.col > from.col) { return Direction::UpperRight; }
     // right
-    if (x2 == x1 && y2 > y1) { return Direction::Right; }
+    if (to.row == from.row && to.col > from.col) { return Direction::Right; }
     // lower right
-    if (x2 > x1 && y2 > y1) { return Direction::LowerRight; }
+    if (to.row > from.row && to.col > from.col) { return Direction::LowerRight; }
     // bottom
-    if (x2 > x1 && y2 == y1) { return Direction::Bottom; }
+    if (to.row > from.row && to.col == from.col) { return Direction::Bottom; }
     // lower left
-    if (x2 > x1 && y2 < y1) { return Direction::LowerLeft; }
+    if (to.row > from.row && to.col < from.col) { return Direction::LowerLeft; }
     // left
-    if (x2 == x1 && y2 < y1) { return Direction::Left; }
+    if (to.row == from.row && to.col < from.col) { return Direction::Left; }
     // upper left
-    if (x2 < x1 && y2 < y1) { return Direction::UpperLeft; }
+    if (to.row < from.row && to.col < from.col) { return Direction::UpperLeft; }
     // top
-    if (x2 < x1 && y2 == y1) { return Direction::Top; }
+    if (to.row < from.row && to.col == from.col) { return Direction::Top; }
     // default case
     return Direction::Invalid;
 }
 
 void FanoronaGame::clearDiagonal(int direction, bool attackType, int row_2, int col_2, int player)
 {   
-    if (attackType == false) {
-        if ((direction == 1) || (direction == 3)) {
+    if (attackType == ATTACK_APPROACH) {
+        if ((direction == Direction::UpperRight) || (direction == Direction::LowerRight)) {
             direction += 4;
         } else {
             direction -= 4;
         }
     }
-    if (direction == 1) {
+    if (direction == Direction::UpperRight) {
         while (1) {
             row_2 -= 1;
             col_2 += 1;
@@ -75,7 +92,7 @@ void FanoronaGame::clearDiagonal(int direction, bool attackType, int row_2, int 
 
         }
     }
-    if (direction == 3) {
+    if (direction == Direction::LowerRight) {
         while (1) {
             row_2 += 1;
             col_2 += 1;
@@ -90,7 +107,7 @@ void FanoronaGame::clearDiagonal(int direction, bool attackType, int row_2, int 
             }
         }
     }
-    if (direction == 5) {
+    if (direction == Direction::LowerLeft) {
         while (1) {
             row_2 += 1;
             col_2 -= 1;
@@ -105,7 +122,7 @@ void FanoronaGame::clearDiagonal(int direction, bool attackType, int row_2, int 
             }
         }
     }
-    if (direction == 7) {
+    if (direction == Direction::UpperLeft) {
         while (1) {
         row_2 -= 1;
         col_2 -= 1;
@@ -125,15 +142,15 @@ void FanoronaGame::clearDiagonal(int direction, bool attackType, int row_2, int 
 
 void FanoronaGame::clearHorizontal(int direction, bool attackType, int row_2, int col_2, int player)
 {   
-    if (attackType == false) {
-        if (direction == 2) {
+    if (attackType == ATTACK_APPROACH) {
+        if (direction == Direction::Right) {
             direction += 4;
         }
         else {
             direction -= 4;
         }
     }
-    if (direction == 2) {
+    if (direction == Direction::Right) {
         while (1) {
             col_2 += 1;
             if (col_2 == 9) {
@@ -147,7 +164,7 @@ void FanoronaGame::clearHorizontal(int direction, bool attackType, int row_2, in
             }
         }
     }
-    if (direction == 6) {
+    if (direction == Direction::Left) {
         while (1) {
             col_2 -= 1;
             if (col_2 == -1) {
@@ -166,15 +183,15 @@ void FanoronaGame::clearHorizontal(int direction, bool attackType, int row_2, in
 
 void FanoronaGame::clearVertical(int direction, bool attackType=true, int row_2, int col_2, int player)
 {
-    if (attackType == false) {
-        if (direction == 4) {
+    if (attackType == ATTACK_APPROACH) {
+        if (direction == Direction::Bottom) {
             direction += 4;
         }
         else {
             direction -= 4;
         }
     } 
-    if (direction == 4) {
+    if (direction == Direction::Bottom) {
         while (1) {
             row_2 += 1;
             if (row_2 == 5) {
@@ -203,6 +220,83 @@ void FanoronaGame::clearVertical(int direction, bool attackType=true, int row_2,
         }
     }
     return;
+}
+
+Movement FanoronaGame::generateMovement(int row, int col, int deltaRow, int deltaCol, int player)
+{
+    // Check for approaching move
+    if ((grid[row + deltaRow * 2][col + deltaCol * 2] != player) && (grid[row + deltaRow * 2][col + deltaCol * 2] != 0)) {
+        return { {row, col}, {row+deltaRow, col+deltaCol}, true, ATTACK_APPROACH };
+    }
+    // Check for withdrawal move
+    else if ((grid[row + (deltaRow * -1)][col + (deltaCol * -1)] != player) && (grid[row + (deltaRow * -1)][col + (deltaCol * -1)] != 0)) {
+        return { {row, col}, {row+deltaRow, col+deltaCol}, true, ATTACK_WITHDRAW };
+    }
+    // Only simple move possible
+    else {
+        return { {row, col}, {row+deltaRow, col+deltaCol}, false, false };
+    }
+}
+
+std::vector<Movement> FanoronaGame::generateMovements(int row, int col, int player)
+{
+    int count = 0;
+    bool strongPosition = isStrongPosition(row, col);
+    std::vector<Movement> captureList;
+    std::vector<Movement> moveList;
+    // First 4 values for cross Nhood, last four for diagonals
+    int row_neighbours[] = { 0, 0, -1, +1, -1, -1, +1, +1 };
+    int col_neighbours[] = {-1, +1, 0, 0, -1, +1, -1, +1  };
+
+    for (int i = 0; i < 9; i++) {
+        if (strongPosition == false && i > 3) {
+            // Stops loop if stone is not in strong position
+            break;
+        }
+        if (((row + row_neighbours[i]) < 0) || ((row + row_neighbours[i]) > 8)) {
+        // Row is out of bounds
+            continue;
+        }
+        else if (((col + col_neighbours[i]) < 0) || ((col + col_neighbours[i]) > 8)) {
+            // Column is out of bounds
+            continue;
+        }
+        else if (grid[row+row_neighbours[i]][col+col_neighbours[i]] == 0) {
+            // Generate the movement if the neighbor is empty (e.g. a move is possible)
+            count += 1;
+            Movement m = generateMovement(row, col, row_neighbours[i], col_neighbours[i], player);
+            if (m.isCapturing) {
+                captureList.push_back(m);
+                // Stop the loop if one entrance was done?
+            }
+            else {
+                moveList.push_back(m);
+                // Only one entrance?
+            }
+        }
+    }
+    return captureList.size() > 0 ? captureList : moveList;
+}
+
+bool FanoronaGame::isStrongPosition(int row, int col)
+{
+    // Check if stone has a strong or weak position
+    if ((row % 2) == 0) {
+        if ((col % 2) == 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        if ((col % 2) == 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 }
 
 bool FanoronaGame::hasWon_impl() const {
@@ -240,4 +334,7 @@ void FanoronaGame::printGrid() {
             }
         }
     }
+}
+int FanoronaGame::at(Position p) {
+    return grid[p.row][p.col];
 }
