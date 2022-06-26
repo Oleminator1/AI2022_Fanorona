@@ -1,4 +1,4 @@
-#include "StoneMoves.h"
+/*#include "StoneMoves.h"
 #include <iostream>
 #include <vector>
 
@@ -14,7 +14,7 @@ Move MoveGenerator::nextMove() {
 
 
 
-/*void MoveGenerator::evaluatePlayerStones(int player, int grid[5][9])
+void MoveGenerator::evaluatePlayerStones(int player, int grid[5][9])
 {
     // Evaluate all possibilites for the player
     bool strongPosition;

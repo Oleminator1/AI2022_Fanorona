@@ -181,7 +181,7 @@ void FanoronaGame::clearHorizontal(int direction, bool attackType, int row_2, in
     return;
 }
 
-void FanoronaGame::clearVertical(int direction, bool attackType=true, int row_2, int col_2, int player)
+void FanoronaGame::clearVertical(int direction, bool attackType, int row_2, int col_2, int player)
 {
     if (attackType == ATTACK_APPROACH) {
         if (direction == Direction::Bottom) {
@@ -299,42 +299,26 @@ bool FanoronaGame::isStrongPosition(int row, int col)
     }
 }
 
-bool FanoronaGame::hasWon_impl() const {
-    return false;
-}
-bool FanoronaGame::isGameOver_impl() const {
-    return false;
-}
-void FanoronaGame::makeMove_impl(Move n) {
-
-}
-void FanoronaGame::undoMove_impl() {
-
-}
-MoveGenerator FanoronaGame::moveGenerator_impl() const {
-    return MoveGenerator(this);
-}
-
-void FanoronaGame::printGrid() {
+/*void FanoronaGame::printGrid() {
     // Print the grid in the console
     for (int row = 0; row < 5; row++) {
         for (int column = 0; column < 9; column++) {
-            cout << grid[row][column];
+            std::cout << grid[row][column];
             if (column < 8) {
-                cout << " - ";
+                std::cout << " - ";
             }
             if (column == 8) {
-                cout << endl;
+                std::cout << std::endl;
                 if (row == 0 || row == 2) {
-                    cout << "| \\ | / | \\ | / | \\ | / | \\ | / |" << endl;
+                    std::cout << "| \\ | / | \\ | / | \\ | / | \\ | / |" << std::endl;
                 }
                 else if (row == 1 || row == 3) {
-                    cout << "| / | \\ | / | \\ | / | \\ | / | \\ |" << endl;
+                    std::cout << "| / | \\ | / | \\ | / | \\ | / | \\ |" << std::endl;
                 }
             }
         }
     }
-}
+}*/
 int FanoronaGame::at(Position p) {
     return grid[p.row][p.col];
 }

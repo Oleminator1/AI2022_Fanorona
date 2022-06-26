@@ -1,7 +1,6 @@
 #ifndef AI2022_FANORONA_FANORONA_GAME_H
 #define AI2022_FANORONA_FANORONA_GAME_H
 
-#include "BoardGameAI/BoardGame.h"
 #include "json.hpp"
 #include "StoneMoves.h"
 #include <stdexcept>
@@ -29,7 +28,7 @@ struct Move {
     std::vector<Movement> movements;
 };
 
-class FanoronaGame : BoardGame<FanoronaGame> {
+class FanoronaGame {
     private:
         static int STARTING_GRID[5][9];
         int currentPlayer;
@@ -40,7 +39,7 @@ class FanoronaGame : BoardGame<FanoronaGame> {
 
         // Game Functions
         void startGame();
-        std::vector<Movement> FanoronaGame::selectStone(Position pos);
+        std::vector<Movement> selectStone(Position pos);
         void moveStone(Movement m);
         Direction getDirection(Position from, Position to);
         void clearDiagonal(int direction, bool attackType, int row_2, int col_2, int player);
@@ -50,16 +49,9 @@ class FanoronaGame : BoardGame<FanoronaGame> {
         Movement generateMovement(int row, int col, int deltaRow, int deltaCol, int player);
         std::vector<Movement> generateMovements(int row, int col, int player);
 
-        // AI Functions
-        bool hasWon_impl() const;
-        bool isGameOver_impl() const;
-        void makeMove_impl(Move n);
-        void undoMove_impl();
-        MoveGenerator moveGenerator_impl() const;
-
         // Debug & Helper Functions
         int at(Position p);
-        void printGrid();
+        //void printGrid();
 };
 
 #endif //AI2022_FANORONA_FANORONA_GAME_H
