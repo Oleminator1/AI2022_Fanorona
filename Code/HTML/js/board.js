@@ -4,10 +4,13 @@ const GAME_SERVER = "ws://127.0.0.1:9002";
 
 function MessageBox(element) {
     this.element = element;
+    this.timeout = null;
 
     this.setMessage = (message, state) => {
         this.element.textContent = message;
         this.element.className = "message message-" + state;
+        if(this.timeout) clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => this.setMessage("", "none"), 4000);
     }
     this.setInfo = (message) => this.setMessage(message, "info");
     this.setError = (message) => this.setMessage(message, "error");
@@ -18,11 +21,16 @@ function GamePawn(x, y) {
     this.x = x;
     this.y = y;
     this.state = 0;
+    this.highlighted = false;
     this.onClickCallback = null;
 
     this.setState = (state) => {
         if(typeof(state) !== "undefined") { this.state = state; }
-        this.element.className = "pawn " + this.getClass();
+        this.element.className = "pawn " + this.getClass() + (this.highlighted ? " pawn-highlight" : "");
+    }
+    this.setHighlighted = (highlighted) => {
+        if(typeof(highlighted) !== "undefined") { this.highlighted = highlighted; }
+        this.setState();
     }
 
     this.getClass = () => {
@@ -47,6 +55,7 @@ function GameBoard(table) {
     this.pawns = [];
     this.selectedPawn = null;
     this.onPawnMoveCallback = null;
+    this.onPawnSelectCallback = null;
 
     this.setPawnStates = (pawnStates) => {
         for(let y = 0; y < BOARD_HEIGHT; y++) {
@@ -58,19 +67,24 @@ function GameBoard(table) {
     this.setPawnState = (x, y, pawnState) => {
         this.pawns.find(p => p.x === x && p.y === y).setState(pawnState);
     }
+    this.setPawnHighlighted = (x, y, pawnHighlighted) => {
+        this.pawns.find(p => p.x === x && p.y === y).setHighlighted(pawnHighlighted);
+    }
     this.pawnClicked = (pawn) => {
-        if(this.selectedPawn) {
+        this.onPawnSelectCallback({ row: pawn.y, col: pawn.x });
+        /*if(this.selectedPawn) {
             // Transfer state
             console.log("move from " + this.selectedPawn.x + ", "+ this.selectedPawn.y + " to " + pawn.x + ", "+ pawn.y);
             this.onPawnMoveCallback({ row: this.selectedPawn.y, col: this.selectedPawn.x }, { row: pawn.y, col: pawn.x });
             this.selectedPawn = null;
         }else {
             this.selectedPawn = pawn;
-        }
+        }*/
 
     }
 
     this.onPawnMove = (callback) => this.onPawnMoveCallback = callback;
+    this.onPawnSelect = (callback) => this.onPawnSelectCallback = callback;
 
     for(let y = 0; y < BOARD_HEIGHT; y++) {
         let row = document.createElement("tr");
@@ -88,6 +102,7 @@ function GameConnection(address) {
     this.sock = new WebSocket(address);
 
     this.onBoardUpdateCallback = null;
+    this.onMovementsUpdateCallback = null;
     this.onErrorCallback = null;
     this.onConnectedCallback = null;
 
@@ -99,6 +114,9 @@ function GameConnection(address) {
     this.startGame = () => {
         this.sock.send(JSON.stringify({ command: "start" }));
     }
+    this.selectPawn = (position) => {
+        this.sock.send(JSON.stringify({ command: "select", position }));
+    }
     this.movePawn = (from, to) => {
         this.sock.send(JSON.stringify({ command: "move", from, to }));
     }
@@ -107,12 +125,15 @@ function GameConnection(address) {
             this.onBoardUpdateCallback(msg.board);
         } else if(msg.command === "error") {
             this.onErrorCallback(msg.message);
+        } else if(msg.command === "movements") {
+            this.onMovementsCallback(msg.movements);
         } else {
             console.error("Unknown command: " + msg.command);
         }
     }
 
     this.onBoardUpdate = (callback) => this.onBoardUpdateCallback = callback;
+    this.onMovementsUpdate = (callback) => this.onMovementsCallback = callback;
     this.onError = (callback) => this.onErrorCallback = callback;
     this.onConnected = (callback) => this.onConnectedCallback = callback;
 }
@@ -122,6 +143,9 @@ let gb = new GameBoard(document.getElementById("pawnTable"));
 
 let gc = new GameConnection(GAME_SERVER);
 gc.onBoardUpdate(board => gb.setPawnStates(board[0].map((_, colIndex) => board.map(row => row[colIndex]))));
+gc.onMovementsUpdate(movements => {
+    movements.forEach(m => gb.setPawnHighlighted(m.to.col, m.to.row, true));
+});
 gc.onError(message => mb.setError(message));
 gc.onConnected(() => {
     gc.startGame();
@@ -129,6 +153,9 @@ gc.onConnected(() => {
 
 gb.onPawnMove((from, to) => {
     gc.movePawn(from, to);
+});
+gb.onPawnSelect(pos => {
+    gc.selectPawn(pos);
 });
 
 gc.connect();

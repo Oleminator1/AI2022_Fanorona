@@ -19,6 +19,7 @@ using websocketpp::lib::bind;
 #define CMD_MOVE "move"
 #define CMD_BOARD "board"
 #define CMD_START "start"
+#define CMD_MOVEMENTS "movements"
 
 #define SERVER_PORT 9002
 
@@ -39,6 +40,18 @@ json jsonBoard() {
         {"board", game.grid}
     };
 }
+json jsonMovements(std::vector<Movement> const& movements) {
+    std::vector<json> movementsJson;
+    for(auto const& movement : movements) {
+        movementsJson.push_back({ 
+            {"to", { {"row", movement.to.row}, {"col", movement.to.col} }}
+        });
+    }
+    return {
+        {KEY_COMMAND, CMD_MOVEMENTS},
+        {"movements", movementsJson}
+    };
+}
 
 json processCommand(json& message) {
     if(!message.contains(KEY_COMMAND)){
@@ -53,7 +66,10 @@ json processCommand(json& message) {
         // Convert the JSON values into more practical structs
         Position p = { message["position"]["row"].get<int>(), message["position"]["col"].get<int>() };
         // Try to select the stone
-        try{ game.selectStone(p); } catch(const std::runtime_error& e) { return jsonError(e.what()); }
+        std::vector<Movement> ms;
+        try{ ms = game.selectStone(p); } catch(const std::runtime_error& e) { return jsonError(e.what()); }
+        // Return the possible movements
+        return jsonMovements(ms);
     } else if (cmd == CMD_MOVE) {
         // Convert the JSON values into more practical structs
         Position from = { message["from"]["row"].get<int>(), message["from"]["col"].get<int>() };

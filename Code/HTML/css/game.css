@@ -30,6 +30,9 @@
     background-image:url(../img/pawn-black.svg);
     background-size: cover;
 }
+.pawn-highlight {
+    background: yellow;
+}
 
 .message {
     padding: 10px;
