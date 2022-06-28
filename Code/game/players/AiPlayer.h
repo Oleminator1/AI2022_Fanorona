@@ -11,6 +11,8 @@ using json = nlohmann::json;
 
 class AiPlayer : public GamePlayer {
     private:
+        void evaluate();
+        void minimax();
     public:
         AiPlayer(int p_id, FanoronaGame& p_game);
         void turnStarted() override;
