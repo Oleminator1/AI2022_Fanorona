@@ -101,8 +101,7 @@ function GameConnection(address) {
     this.address = address;
     this.sock = new WebSocket(address);
 
-    this.onBoardUpdateCallback = null;
-    this.onMovementsUpdateCallback = null;
+    this.onStatusCallback = null;
     this.onErrorCallback = null;
     this.onConnectedCallback = null;
 
@@ -117,23 +116,18 @@ function GameConnection(address) {
     this.selectPawn = (position) => {
         this.sock.send(JSON.stringify({ command: "select", position }));
     }
-    this.movePawn = (from, to) => {
-        this.sock.send(JSON.stringify({ command: "move", from, to }));
-    }
     this.onMessage = (msg) => {
-        if(msg.command === "board") {
-            this.onBoardUpdateCallback(msg.board);
+        console.dir(msg);
+        if(msg.command === "status") {
+            this.onStatusCallback(msg);
         } else if(msg.command === "error") {
             this.onErrorCallback(msg.message);
-        } else if(msg.command === "movements") {
-            this.onMovementsCallback(msg.movements);
         } else {
             console.error("Unknown command: " + msg.command);
         }
     }
 
-    this.onBoardUpdate = (callback) => this.onBoardUpdateCallback = callback;
-    this.onMovementsUpdate = (callback) => this.onMovementsCallback = callback;
+    this.onStatus = (callback) => this.onStatusCallback = callback;
     this.onError = (callback) => this.onErrorCallback = callback;
     this.onConnected = (callback) => this.onConnectedCallback = callback;
 }
@@ -142,17 +136,14 @@ let mb = new MessageBox(document.getElementById("message"));
 let gb = new GameBoard(document.getElementById("pawnTable"));
 
 let gc = new GameConnection(GAME_SERVER);
-gc.onBoardUpdate(board => gb.setPawnStates(board[0].map((_, colIndex) => board.map(row => row[colIndex]))));
-gc.onMovementsUpdate(movements => {
-    movements.forEach(m => gb.setPawnHighlighted(m.to.col, m.to.row, true));
-});
+gc.onStatus(gameStatus => {
+    let { board } = gameStatus;
+    // Set all the pawns
+    gb.setPawnStates(board[0].map((_, colIndex) => board.map(row => row[colIndex])))}
+);
 gc.onError(message => mb.setError(message));
 gc.onConnected(() => {
     gc.startGame();
-});
-
-gb.onPawnMove((from, to) => {
-    gc.movePawn(from, to);
 });
 gb.onPawnSelect(pos => {
     gc.selectPawn(pos);

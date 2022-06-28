@@ -4,8 +4,12 @@
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
+#include <memory>
 #include <iostream>
 #include "game/FanoronaGame.h"
+#include "game/players/HumanPlayer.h"
+#include "game/players/AiPlayer.h"
+#include "game/util/Structs.h"
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
@@ -17,7 +21,7 @@ using websocketpp::lib::bind;
 #define CMD_ERROR "error"
 #define CMD_SELECT "select"
 #define CMD_MOVE "move"
-#define CMD_BOARD "board"
+#define CMD_STATUS "status"
 #define CMD_START "start"
 #define CMD_MOVEMENTS "movements"
 
@@ -27,6 +31,7 @@ using websocketpp::lib::bind;
 typedef server::message_ptr message_ptr;
 
 FanoronaGame game;
+std::vector<std::shared_ptr<GamePlayer>> players;
 
 json jsonError(std::string error) {
     return {
@@ -34,13 +39,14 @@ json jsonError(std::string error) {
         {"message", error}
     };
 }
-json jsonBoard() {
+json jsonStatus() {
     return {
-        {KEY_COMMAND, CMD_BOARD},
-        {"board", game.grid}
+        {KEY_COMMAND, CMD_STATUS},
+        {"board", game.grid},
+        {"player", players[game.currentPlayer()]->status()}
     };
 }
-json jsonMovements(std::vector<Movement> const& movements) {
+/*json jsonMovements(std::vector<Movement> const& movements) {
     std::vector<json> movementsJson;
     for(auto const& movement : movements) {
         movementsJson.push_back({ 
@@ -51,7 +57,7 @@ json jsonMovements(std::vector<Movement> const& movements) {
         {KEY_COMMAND, CMD_MOVEMENTS},
         {"movements", movementsJson}
     };
-}
+}*/
 
 json processCommand(json& message) {
     if(!message.contains(KEY_COMMAND)){
@@ -60,28 +66,27 @@ json processCommand(json& message) {
     }
     std::string cmd = message[KEY_COMMAND].get<std::string>();
     if(cmd == CMD_START) {
+        // Add the two players
+        players.clear();
+        std::shared_ptr<GamePlayer> ap = std::make_shared<AiPlayer>(0, game);
+        players.push_back(ap);
+        std::shared_ptr<GamePlayer> hp = std::make_shared<HumanPlayer>(1, game);
+        players.push_back(hp);
+        // Start the game
         game.startGame();
-        return jsonBoard();
+        // Return a status message
+        return jsonStatus();
     } else if (cmd == CMD_SELECT) {
         // Convert the JSON values into more practical structs
         Position p = { message["position"]["row"].get<int>(), message["position"]["col"].get<int>() };
-        // Try to select the stone
-        std::vector<Movement> ms;
-        try{ ms = game.selectStone(p); } catch(const std::runtime_error& e) { return jsonError(e.what()); }
-        // Return the possible movements
-        return jsonMovements(ms);
-    } else if (cmd == CMD_MOVE) {
-        // Convert the JSON values into more practical structs
-        Position from = { message["from"]["row"].get<int>(), message["from"]["col"].get<int>() };
-        Position to = { message["to"]["row"].get<int>(), message["to"]["col"].get<int>() };
-        // Try to apply the move and return the board
+        // Pass the selection to the player
         try{
-            //game.moveStone(from.row, from.col, to.row, to.col);
-        } catch(const std::exception& e) {
+            players[game.currentPlayer()]->stoneSelected(p);
+        }catch(const std::runtime_error& e) {
             return jsonError(e.what());
         }
-        
-        return jsonBoard();
+        // Return a status message
+        return jsonStatus();
     }
     return jsonError("Not a recognized command");
 }

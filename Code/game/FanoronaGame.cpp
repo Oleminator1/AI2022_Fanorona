@@ -10,41 +10,26 @@ void FanoronaGame::startGame() {
     // set the board to the starting configuration
     std::copy(&FanoronaGame::STARTING_GRID[0][0], &FanoronaGame::STARTING_GRID[0][0]+5*9, &grid[0][0]);
     // player 1 starts
-    currentPlayer = PLAYER_WHITE;
+    std::vector<Movement> currentMovements;
+    currentMove = { PLAYER_WHITE, currentMovements };
+    //currentPlayer = PLAYER_WHITE;
 }
-std::vector<Movement> FanoronaGame::selectStone(Position pos) {
-    // Verify the stone is of the current player
-    if(at(pos) != currentPlayer) throw std::runtime_error("Cannot select an empty stone or stone of the non-current player");
-    // Verify the stone is moveable
-    auto movements = generateMovements(pos.row, pos.col, currentPlayer);
-    if(movements.size() == 0) throw std::runtime_error("Cannot select a stone with no possible movements");
-    // Return the list of possible movements straight away, while we have it
-    return movements;
-}
-void FanoronaGame::moveStone(Movement m)
-{
-    // Verify the stone at position 1 is of the current player
-    if(grid[m.from.row][m.from.col] != currentPlayer) throw std::runtime_error("Cannot move a piece of the non-current player");
-    // Verify we're moving exactly one position
-    if(abs(m.from.row - m.to.row) + abs(m.from.col - m.to.col) != 1) throw std::runtime_error("Pieces must be moved exactly one position");
-    // row1, col1 are the old and row2, col2 the new position
-    // assign the new positions
-    grid[m.to.row][m.to.col] = grid[m.from.row][m.from.col];
+void FanoronaGame::executeMovement(Movement const& m) {
+    // Set the from position to empty as we're moving away from it
     grid[m.from.row][m.from.col] = 0;
-    int dir = getDirection(m.from, m.to);
-    if ((dir % 2) != 0) {
-        clearDiagonal(dir, m.attackType, m.to.row, m.to.col, currentPlayer);
+    // If the move is capturing, we have to perform some more complicated stuff
+    if(m.isCapturing) {
+        // Get the direction of the clearing, reverse it if this is a withdraw move
+        Direction d = m.attackType == ATTACK_APPROACH ? getDirection(m.from, m.to) : reverseDirection(getDirection(m.from, m.to));
+        // If we're approaching we're clearing from the to-position, if we're withdrawing we're clearing from the from-position
+        Position p = m.attackType == ATTACK_APPROACH ? m.to : m.from;
+        // Clear the appropriate stones
+        clearDirection(p, d, currentMove.player);
     }
-    else {
-        if ((dir % 4) == 0) {
-            clearVertical(dir, m.attackType, m.to.row, m.to.col, currentPlayer);
-        }
-        else {
-            clearHorizontal(dir, m.attackType, m.to.row, m.to.col, currentPlayer);
-        }
-    }
+    // Move the stone to the "to" position in any case
+    grid[m.to.row][m.to.col] = currentMove.player;
 }
-Direction FanoronaGame::getDirection(Position from, Position to)
+Direction FanoronaGame::getDirection(Position const& from, Position const& to)
 {
     // return direction of movement
     // upper right
@@ -66,160 +51,42 @@ Direction FanoronaGame::getDirection(Position from, Position to)
     // default case
     return Direction::Invalid;
 }
-
-void FanoronaGame::clearDiagonal(int direction, bool attackType, int row_2, int col_2, int player)
-{   
-    if (attackType == ATTACK_APPROACH) {
-        if ((direction == Direction::UpperRight) || (direction == Direction::LowerRight)) {
-            direction += 4;
-        } else {
-            direction -= 4;
-        }
+Direction FanoronaGame::reverseDirection(Direction d) {
+    if(d <= 4){
+        return (Direction)(d + 4);
+    } else {
+        return (Direction)(d - 4);
     }
-    if (direction == Direction::UpperRight) {
-        while (1) {
-            row_2 -= 1;
-            col_2 += 1;
-            if ((row_2 == -1) || (col_2 == 9)) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-
-        }
-    }
-    if (direction == Direction::LowerRight) {
-        while (1) {
-            row_2 += 1;
-            col_2 += 1;
-            if ((row_2 == 5) || (col_2 == 9)) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    if (direction == Direction::LowerLeft) {
-        while (1) {
-            row_2 += 1;
-            col_2 -= 1;
-            if ((row_2 == 5) || (col_2 == -1)) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    if (direction == Direction::UpperLeft) {
-        while (1) {
-        row_2 -= 1;
-        col_2 -= 1;
-        if ((row_2 == -1) || (col_2 == -1)) {
-            break;
-        }
-        if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-            grid[row_2][col_2] = 0;
-        }
-        else {
-            break;
-        }
-        }
-    }
-    return;
 }
 
-void FanoronaGame::clearHorizontal(int direction, bool attackType, int row_2, int col_2, int player)
-{   
-    if (attackType == ATTACK_APPROACH) {
-        if (direction == Direction::Right) {
-            direction += 4;
-        }
-        else {
-            direction -= 4;
-        }
+void FanoronaGame::clearDirection(Position const& origin, Direction direction, int player) {
+    // Copy the position from which we're going, it'll track where we're moving
+    Position p = { origin.row, origin.col };
+    // Move it once to the first enemy stone
+    movePosition(p, direction);
+    // Continue deleting stones in the direction as long as they're on the field and they're the enemy's (aka not ours and not empty)
+    while(inBounds(p) && at(p) != player && at(p) != 0) {
+        // Delete the stone
+        grid[p.row][p.col] = 0;
+        // Advance the position
+        movePosition(p, direction);
     }
-    if (direction == Direction::Right) {
-        while (1) {
-            col_2 += 1;
-            if (col_2 == 9) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    if (direction == Direction::Left) {
-        while (1) {
-            col_2 -= 1;
-            if (col_2 == -1) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    return;
 }
 
-void FanoronaGame::clearVertical(int direction, bool attackType, int row_2, int col_2, int player)
-{
-    if (attackType == ATTACK_APPROACH) {
-        if (direction == Direction::Bottom) {
-            direction += 4;
-        }
-        else {
-            direction -= 4;
-        }
-    } 
-    if (direction == Direction::Bottom) {
-        while (1) {
-            row_2 += 1;
-            if (row_2 == 5) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
+
+// Helper for moving a position into a direction
+void FanoronaGame::movePosition(Position& p, Direction d) {
+    switch(d) {
+        case Direction::UpperRight: p.row -= 1; p.col += 1; break;
+        case Direction::Right: p.col += 1; break;
+        case Direction::LowerRight: p.row += 1; p.col += 1; break;
+        case Direction::Bottom: p.row += 1; break;
+        case Direction::LowerLeft: p.row += 1; p.col -= 1; break;
+        case Direction::Left: p.col -=1; break;
+        case Direction::UpperLeft: p.row -= 1; p.col -= 1; break;
+        case Direction::Top: p.row -= 1; break;
+        default: throw std::runtime_error("Cannot move position in unknown direction");
     }
-    if (direction == 8) {
-        while (1) {
-            row_2 -= 1;
-            if (row_2 == -1) {
-                break;
-            }
-            if ((grid[row_2][col_2] != 0) && (grid[row_2][col_2] != player)) {
-                grid[row_2][col_2] = 0;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    return;
 }
 
 Movement FanoronaGame::generateMovement(int row, int col, int deltaRow, int deltaCol, int player)
@@ -299,26 +166,12 @@ bool FanoronaGame::isStrongPosition(int row, int col)
     }
 }
 
-/*void FanoronaGame::printGrid() {
-    // Print the grid in the console
-    for (int row = 0; row < 5; row++) {
-        for (int column = 0; column < 9; column++) {
-            std::cout << grid[row][column];
-            if (column < 8) {
-                std::cout << " - ";
-            }
-            if (column == 8) {
-                std::cout << std::endl;
-                if (row == 0 || row == 2) {
-                    std::cout << "| \\ | / | \\ | / | \\ | / | \\ | / |" << std::endl;
-                }
-                else if (row == 1 || row == 3) {
-                    std::cout << "| / | \\ | / | \\ | / | \\ | / | \\ |" << std::endl;
-                }
-            }
-        }
-    }
-}*/
-int FanoronaGame::at(Position p) {
+int FanoronaGame::at(Position const& p) {
     return grid[p.row][p.col];
+}
+bool FanoronaGame::inBounds(Position const& p) {
+    return p.row < 5 && p.col < 9;
+}
+int FanoronaGame::currentPlayer() {
+    return currentMove.player;
 }

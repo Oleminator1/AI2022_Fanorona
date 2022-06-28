@@ -6,7 +6,7 @@ include(CTest)
 enable_testing()
 
 set(CMAKE_CXX_STANDARD 20)
-add_executable(fanorona-server main.cpp game/FanoronaGame.cpp game/StoneMoves.cpp)
+add_executable(fanorona-server main.cpp game/FanoronaGame.cpp game/players/GamePlayer.cpp game/players/HumanPlayer.cpp game/players/AiPlayer.cpp)
 
 target_link_libraries(fanorona-server PRIVATE Threads::Threads)
 

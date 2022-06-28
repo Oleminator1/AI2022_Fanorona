@@ -2,7 +2,7 @@
 #define AI2022_FANORONA_FANORONA_GAME_H
 
 #include "json.hpp"
-#include "StoneMoves.h"
+#include "util/Structs.h"
 #include <stdexcept>
 
 #define PLAYER_WHITE 1
@@ -13,25 +13,10 @@
 
 using json = nlohmann::json;
 
-enum Direction { UpperRight = 1, Right = 2, LowerRight = 3, Bottom = 4, LowerLeft = 5, Left = 6, UpperLeft = 7, Top = 8, Invalid = -1 };
-
-struct Position { int row; int col; };
-
-struct Movement {
-    Position from;
-    Position to;
-    bool isCapturing;
-    bool attackType;
-};
-struct Move {
-    int player;
-    std::vector<Movement> movements;
-};
-
 class FanoronaGame {
     private:
         static int STARTING_GRID[5][9];
-        int currentPlayer;
+        //int currentPlayer;
         Move currentMove;
     public:
         // The Game Board
@@ -39,18 +24,25 @@ class FanoronaGame {
 
         // Game Functions
         void startGame();
-        std::vector<Movement> selectStone(Position pos);
-        void moveStone(Movement m);
-        Direction getDirection(Position from, Position to);
-        void clearDiagonal(int direction, bool attackType, int row_2, int col_2, int player);
-        void clearHorizontal(int direction, bool attackType, int row_2, int col_2, int player);
-        void clearVertical(int direction, bool attackType, int row_2, int col_2, int player);
+        //std::vector<Movement> selectStone(Position pos);
+        //void moveStone(Movement m);
+        Direction getDirection(Position const& from, Position const& to);
+        Direction reverseDirection(Direction d);
+        void clearDirection(Position const& origin, Direction direction, int player);
+        //void clearDiagonal(int direction, bool attackType, int row_2, int col_2, int player);
+        //void clearHorizontal(int direction, bool attackType, int row_2, int col_2, int player);
+        //void clearVertical(int direction, bool attackType, int row_2, int col_2, int player);
         bool isStrongPosition(int row, int col);
         Movement generateMovement(int row, int col, int deltaRow, int deltaCol, int player);
         std::vector<Movement> generateMovements(int row, int col, int player);
 
+        void executeMovement(Movement const& m);
+
         // Debug & Helper Functions
-        int at(Position p);
+        int at(Position const& p);
+        bool inBounds(Position const& p);
+        void movePosition(Position& p, Direction d);
+        int currentPlayer();
         //void printGrid();
 };
 
