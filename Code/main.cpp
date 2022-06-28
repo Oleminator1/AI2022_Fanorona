@@ -31,7 +31,7 @@ using websocketpp::lib::bind;
 typedef server::message_ptr message_ptr;
 
 FanoronaGame game;
-std::vector<std::shared_ptr<GamePlayer>> players;
+std::map<int, std::shared_ptr<GamePlayer>> players;
 
 json jsonError(std::string error) {
     return {
@@ -40,6 +40,7 @@ json jsonError(std::string error) {
     };
 }
 json jsonStatus() {
+    std::cout << game.currentPlayer() << std::endl;
     return {
         {KEY_COMMAND, CMD_STATUS},
         {"board", game.grid},
@@ -68,10 +69,10 @@ json processCommand(json& message) {
     if(cmd == CMD_START) {
         // Add the two players
         players.clear();
-        std::shared_ptr<GamePlayer> ap = std::make_shared<AiPlayer>(0, game);
-        players.push_back(ap);
         std::shared_ptr<GamePlayer> hp = std::make_shared<HumanPlayer>(1, game);
-        players.push_back(hp);
+        players[1] = hp;
+        std::shared_ptr<GamePlayer> ap = std::make_shared<AiPlayer>(2, game);
+        players[2] = ap;
         // Start the game
         game.startGame();
         // Return a status message

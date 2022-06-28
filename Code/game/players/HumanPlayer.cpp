@@ -30,8 +30,14 @@ void HumanPlayer::stoneSelected(Position const& p) {
         if(!movementFound) throw std::runtime_error("Not a valid movement");
         // Execute the movement
         game->executeMovement(m);
-        // Reset stone selection fixed for now
-        //isStoneSelected = false;
+        // Advance the selected stone and generate new possible movements
+        selectedStone = { m.to.row, m.to.col };
+        possibleMovements = game->generateMovements(m.to.row, m.to.col, id);
+        // If there are none, end the turn automatically
+        if(possibleMovements.size() == 0){
+            isStoneSelected = false;
+            game->endMove();
+        }
     }
 }
 json HumanPlayer::status() {

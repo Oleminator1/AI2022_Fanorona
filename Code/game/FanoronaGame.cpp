@@ -31,6 +31,11 @@ void FanoronaGame::executeMovement(Movement const& m) {
     // Add the movement to the current move
     currentMove.movements.push_back(m);
 }
+void FanoronaGame::endMove() {
+    std::vector<Movement> currentMovements;
+    currentMove = { currentMove.player == PLAYER_WHITE ? PLAYER_BLACK : PLAYER_WHITE, currentMovements };
+}
+
 Direction FanoronaGame::getDirection(Position const& from, Position const& to)
 {
     // return direction of movement

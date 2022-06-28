@@ -37,6 +37,7 @@ class FanoronaGame {
         std::vector<Movement> generateMovements(int row, int col, int player);
 
         void executeMovement(Movement const& m);
+        void endMove();
 
         // Debug & Helper Functions
         int at(Position const& p);
