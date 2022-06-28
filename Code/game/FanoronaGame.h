@@ -4,6 +4,7 @@
 #include "json.hpp"
 #include "util/Structs.h"
 #include <stdexcept>
+#include <iostream>
 
 #define PLAYER_WHITE 1
 #define PLAYER_BLACK 2

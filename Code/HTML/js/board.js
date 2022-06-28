@@ -76,14 +76,12 @@ function GameBoard(table) {
         this.pawns.forEach(p => p.setHighlighted(false));
     }
     this.setPawnHighlighted = (x, y, pawnHighlighted) => {
-        this.resetPawnHighlighted();
         this.pawns.find(p => p.x === x && p.y === y).setHighlighted(pawnHighlighted);
     }
     this.resetPawnSelected = () => {
         this.pawns.forEach(p => p.setSelected(false));
     }
     this.setPawnSelected = (x, y, pawnSelected) => {
-        this.resetPawnSelected();
         this.pawns.find(p => p.x === x && p.y === y).setSelected(pawnSelected);
     }
     this.pawnClicked = (pawn) => {
@@ -162,16 +160,14 @@ gc.onStatus(gameStatus => {
     // Check if the current player is human
     if(player.type === "human") {
         // If we have a selected stone, highlight that
+        gb.resetPawnSelected();
         if(player.stone) {
             gb.setPawnSelected(player.stone.col, player.stone.row, true);
-        } else {
-            gb.resetPawnSelected();
         }
         // If we have movements options, highlight those
+        gb.resetPawnHighlighted();
         if(player.movements) {
             player.movements.forEach(m => gb.setPawnHighlighted(m.to.col, m.to.row, true));
-        } else {
-            gb.resetPawnHighlighted();
         }
     }
 });

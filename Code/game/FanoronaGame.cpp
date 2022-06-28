@@ -11,10 +11,11 @@ void FanoronaGame::startGame() {
     std::copy(&FanoronaGame::STARTING_GRID[0][0], &FanoronaGame::STARTING_GRID[0][0]+5*9, &grid[0][0]);
     // player 1 starts
     std::vector<Movement> currentMovements;
-    currentMove = { PLAYER_WHITE, currentMovements };
+    currentMove = { PLAYER_BLACK, currentMovements };
     //currentPlayer = PLAYER_WHITE;
 }
 void FanoronaGame::executeMovement(Movement const& m) {
+    std::cout << "Movement: (" << m.from.row << "," << m.from.col << ") => (" << m.to.row << "," << m.to.col << ") | Capturing: " << (m.isCapturing ? "Yes" : "No") << " | AttackType: " << (m.attackType ? "Withdraw" : "Attack") << std::endl;
     // Set the from position to empty as we're moving away from it
     grid[m.from.row][m.from.col] = 0;
     // If the move is capturing, we have to perform some more complicated stuff
@@ -28,8 +29,10 @@ void FanoronaGame::executeMovement(Movement const& m) {
     }
     // Move the stone to the "to" position in any case
     grid[m.to.row][m.to.col] = currentMove.player;
+    std::cout << "Pushing into movements (" << currentMove.movements.size() << ")" << std::endl;
     // Add the movement to the current move
     currentMove.movements.push_back(m);
+    std::cout << "Movement finished" << std::endl;
 }
 void FanoronaGame::endMove() {
     std::vector<Movement> currentMovements;
@@ -114,6 +117,11 @@ Movement FanoronaGame::generateMovement(int row, int col, int deltaRow, int delt
 
 std::vector<Movement> FanoronaGame::generateMovements(int row, int col, int player)
 {
+    // If the last movement wasnt capturing, we're straight-up done here
+    if(currentMove.movements.size() > 0 && !currentMove.movements.back().isCapturing){
+        std::vector<Movement> empty;
+        return empty;
+    }
     int count = 0;
     bool strongPosition = isStrongPosition(row, col);
     std::vector<Movement> captureList;
