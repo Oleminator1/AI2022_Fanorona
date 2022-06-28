@@ -28,6 +28,8 @@ void FanoronaGame::executeMovement(Movement const& m) {
     }
     // Move the stone to the "to" position in any case
     grid[m.to.row][m.to.col] = currentMove.player;
+    // Add the movement to the current move
+    currentMove.movements.push_back(m);
 }
 Direction FanoronaGame::getDirection(Position const& from, Position const& to)
 {
@@ -121,7 +123,7 @@ std::vector<Movement> FanoronaGame::generateMovements(int row, int col, int play
             break;
         }
         if (((row + row_neighbours[i]) < 0) || ((row + row_neighbours[i]) > 8)) {
-        // Row is out of bounds
+            // Row is out of bounds
             continue;
         }
         else if (((col + col_neighbours[i]) < 0) || ((col + col_neighbours[i]) > 8)) {
@@ -142,7 +144,32 @@ std::vector<Movement> FanoronaGame::generateMovements(int row, int col, int play
             }
         }
     }
-    return captureList.size() > 0 ? captureList : moveList;
+    // If we have capture movements, we have to offer those, otherwise take the simple move list
+    std::vector<Movement> movements = captureList.size() > 0 ? captureList : moveList;
+    // Remove any already visited positions from the movements
+    std::vector<Movement>::iterator it = movements.begin();
+    while(it != movements.end()) {
+        // Check if it's previously visited in the move
+        bool removal = false;
+        for(auto const& vm : currentMove.movements) {
+            if(vm.from.row == it->to.row && vm.from.col == it->to.col) {
+                removal = true; break;
+            }
+        }
+        // Check if it's not pointing in the same direction as the last movement, if one exists
+        if(currentMove.movements.size() > 0 && getDirection(currentMove.movements.back().from, currentMove.movements.back().to) == getDirection(it->from, it->to)) {
+            removal = true;
+        }
+        // If removal is warranted, remove from the movements and point to the next element
+        // Otherwise, advance the iterator
+        if(removal) {
+            it = movements.erase(it);
+        }else{
+            ++it;
+        }
+    }
+    // Return the fruits of our labour
+    return movements;
 }
 
 bool FanoronaGame::isStrongPosition(int row, int col)
