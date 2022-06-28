@@ -43,6 +43,7 @@ void HumanPlayer::stoneSelected(Position const& p) {
 json HumanPlayer::status() {
     // Get the base status message
     json s = GamePlayer::status();
+    s["type"] = "human";
     // Add a stone position and possible movements depending on whether we have it
     if(isStoneSelected) {
         // Convert the movements to JSON first

@@ -22,14 +22,19 @@ function GamePawn(x, y) {
     this.y = y;
     this.state = 0;
     this.highlighted = false;
+    this.selected = false;
     this.onClickCallback = null;
 
     this.setState = (state) => {
         if(typeof(state) !== "undefined") { this.state = state; }
-        this.element.className = "pawn " + this.getClass() + (this.highlighted ? " pawn-highlight" : "");
+        this.element.className = "pawn " + this.getClass() + (this.highlighted ? " pawn-highlight" : "") + (this.selected ? " pawn-selected" : "");
     }
     this.setHighlighted = (highlighted) => {
         if(typeof(highlighted) !== "undefined") { this.highlighted = highlighted; }
+        this.setState();
+    }
+    this.setSelected = (selected) => {
+        if(typeof(selected) !== "undefined") { this.selected = selected; }
         this.setState();
     }
 
@@ -67,8 +72,19 @@ function GameBoard(table) {
     this.setPawnState = (x, y, pawnState) => {
         this.pawns.find(p => p.x === x && p.y === y).setState(pawnState);
     }
+    this.resetPawnHighlighted = () => {
+        this.pawns.forEach(p => p.setHighlighted(false));
+    }
     this.setPawnHighlighted = (x, y, pawnHighlighted) => {
+        this.resetPawnHighlighted();
         this.pawns.find(p => p.x === x && p.y === y).setHighlighted(pawnHighlighted);
+    }
+    this.resetPawnSelected = () => {
+        this.pawns.forEach(p => p.setSelected(false));
+    }
+    this.setPawnSelected = (x, y, pawnSelected) => {
+        this.resetPawnSelected();
+        this.pawns.find(p => p.x === x && p.y === y).setSelected(pawnSelected);
     }
     this.pawnClicked = (pawn) => {
         this.onPawnSelectCallback({ row: pawn.y, col: pawn.x });
@@ -134,13 +150,32 @@ function GameConnection(address) {
 
 let mb = new MessageBox(document.getElementById("message"));
 let gb = new GameBoard(document.getElementById("pawnTable"));
+const currentPlayerImage = document.getElementById("current-player");
 
 let gc = new GameConnection(GAME_SERVER);
 gc.onStatus(gameStatus => {
-    let { board } = gameStatus;
+    let { board, player } = gameStatus;
     // Set all the pawns
-    gb.setPawnStates(board[0].map((_, colIndex) => board.map(row => row[colIndex])))}
-);
+    gb.setPawnStates(board[0].map((_, colIndex) => board.map(row => row[colIndex])))
+    // Set the current player info
+    currentPlayerImage.setAttribute("src", player.id === 1 ? "img/pawn-white.svg" : "img/pawn-black.svg");
+    // Check if the current player is human
+    if(player.type === "human") {
+        // If we have a selected stone, highlight that
+        if(player.stone) {
+            gb.setPawnSelected(player.stone.col, player.stone.row, true);
+        } else {
+            gb.resetPawnSelected();
+        }
+        // If we have movements options, highlight those
+        if(player.movements) {
+            player.movements.forEach(m => gb.setPawnHighlighted(m.to.col, m.to.row, true));
+        } else {
+            gb.resetPawnHighlighted();
+        }
+    }
+});
+
 gc.onError(message => mb.setError(message));
 gc.onConnected(() => {
     gc.startGame();
