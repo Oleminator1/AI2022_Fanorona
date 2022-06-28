@@ -102,17 +102,18 @@ void FanoronaGame::movePosition(Position& p, Direction d) {
 Movement FanoronaGame::generateMovement(int row, int col, int deltaRow, int deltaCol, int player)
 {
     // Check for approaching move
-    if ((grid[row + deltaRow * 2][col + deltaCol * 2] != player) && (grid[row + deltaRow * 2][col + deltaCol * 2] != 0)) {
+    Position approachPosition = { row + deltaRow * 2, col + deltaCol * 2 };
+    if(inBounds(approachPosition) && at(approachPosition) != player && at(approachPosition) != 0) {
         return { {row, col}, {row+deltaRow, col+deltaCol}, true, ATTACK_APPROACH };
     }
     // Check for withdrawal move
-    else if ((grid[row + (deltaRow * -1)][col + (deltaCol * -1)] != player) && (grid[row + (deltaRow * -1)][col + (deltaCol * -1)] != 0)) {
+    Position withdrawPosition = { row + (deltaRow * -1), col + (deltaCol * -1) };
+    if (inBounds(withdrawPosition) && at(withdrawPosition) != player && at(withdrawPosition) != 0) {
         return { {row, col}, {row+deltaRow, col+deltaCol}, true, ATTACK_WITHDRAW };
     }
+    // Otherwise, only a simple move is possible
+    return { {row, col}, {row+deltaRow, col+deltaCol}, false, false };
     // Only simple move possible
-    else {
-        return { {row, col}, {row+deltaRow, col+deltaCol}, false, false };
-    }
 }
 
 std::vector<Movement> FanoronaGame::generateMovements(int row, int col, int player)
@@ -210,7 +211,7 @@ int FanoronaGame::at(Position const& p) {
     return grid[p.row][p.col];
 }
 bool FanoronaGame::inBounds(Position const& p) {
-    return p.row < 5 && p.col < 9;
+    return p.row >= 0 && p.row < 5 && p.col >= 0 && p.col < 9;
 }
 int FanoronaGame::currentPlayer() {
     return currentMove.player;
