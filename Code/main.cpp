@@ -40,7 +40,6 @@ json jsonError(std::string error) {
     };
 }
 json jsonStatus() {
-    std::cout << game.currentPlayer() << std::endl;
     return {
         {KEY_COMMAND, CMD_STATUS},
         {"board", game.grid},
@@ -69,10 +68,10 @@ json processCommand(json& message) {
     if(cmd == CMD_START) {
         // Add the two players
         players.clear();
-        std::shared_ptr<GamePlayer> hp = std::make_shared<HumanPlayer>(1, game);
-        players[1] = hp;
-        std::shared_ptr<GamePlayer> ap = std::make_shared<HumanPlayer>(2, game);
-        players[2] = ap;
+        std::shared_ptr<GamePlayer> ap = std::make_shared<AiPlayer>(1, game);
+        players[1] = ap;
+        std::shared_ptr<GamePlayer> hp = std::make_shared<HumanPlayer>(2, game);
+        players[2] = hp;
         // Start the game
         game.startGame();
         // Return a status message
@@ -80,11 +79,17 @@ json processCommand(json& message) {
     } else if (cmd == CMD_SELECT) {
         // Convert the JSON values into more practical structs
         Position p = { message["position"]["row"].get<int>(), message["position"]["col"].get<int>() };
+        // Save the currently active player
+        int previousPlayer = game.currentPlayer();
         // Pass the selection to the player
         try{
             players[game.currentPlayer()]->stoneSelected(p);
         }catch(const std::runtime_error& e) {
             return jsonError(e.what());
+        }
+        // If the player changed, trigger the turnStarted of the new player
+        if(game.currentPlayer() != previousPlayer) {
+            players[game.currentPlayer()]->turnStarted();
         }
         // Return a status message
         return jsonStatus();

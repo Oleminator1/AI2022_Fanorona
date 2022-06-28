@@ -5,6 +5,7 @@ GamePlayer::GamePlayer(int p_id, FanoronaGame& p_game) {
     game = &p_game;
 }
 void GamePlayer::stoneSelected(Position const& p) { }
+void GamePlayer::turnStarted() { }
 json GamePlayer::status() {
     return {
         {"id", id}

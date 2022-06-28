@@ -157,15 +157,16 @@ gc.onStatus(gameStatus => {
     gb.setPawnStates(board[0].map((_, colIndex) => board.map(row => row[colIndex])))
     // Set the current player info
     currentPlayerImage.setAttribute("src", player.id === 1 ? "img/pawn-white.svg" : "img/pawn-black.svg");
+    // Reset any markings
+    gb.resetPawnSelected();
+    gb.resetPawnHighlighted();
     // Check if the current player is human
     if(player.type === "human") {
         // If we have a selected stone, highlight that
-        gb.resetPawnSelected();
         if(player.stone) {
             gb.setPawnSelected(player.stone.col, player.stone.row, true);
         }
         // If we have movements options, highlight those
-        gb.resetPawnHighlighted();
         if(player.movements) {
             player.movements.forEach(m => gb.setPawnHighlighted(m.to.col, m.to.row, true));
         }

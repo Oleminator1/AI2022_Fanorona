@@ -14,6 +14,7 @@ class GamePlayer {
 
         GamePlayer(int p_id, FanoronaGame& p_game);
         virtual void stoneSelected(Position const& p);
+        virtual void turnStarted();
         virtual json status();
 };
 
