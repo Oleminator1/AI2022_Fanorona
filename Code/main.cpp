@@ -91,6 +91,10 @@ json processCommand(json& message) {
         if(game.currentPlayer() != previousPlayer) {
             players[game.currentPlayer()]->turnStarted();
         }
+        // Test of winner functionality
+        int winner = game.winner();
+        if(winner == IN_PROGRESS) std::cout << "GAME IN PROGRESS" << std::endl;
+        else std::cout << "WINNER: " << (winner == PLAYER_WHITE ? "White" : "Black") << std::endl;
         // Return a status message
         return jsonStatus();
     }
@@ -118,8 +122,8 @@ int main() {
 
     try {
         // Set logging settings
-        echo_server.set_access_channels(websocketpp::log::alevel::all);
-        echo_server.clear_access_channels(websocketpp::log::alevel::frame_payload);
+        //echo_server.set_access_channels(websocketpp::log::alevel::all);
+        //echo_server.clear_access_channels(websocketpp::log::alevel::frame_payload);
 
         // Initialize Asio
         echo_server.init_asio();

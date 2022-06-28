@@ -38,6 +38,25 @@ void FanoronaGame::endMove() {
     std::vector<Movement> currentMovements;
     currentMove = { currentMove.player == PLAYER_WHITE ? PLAYER_BLACK : PLAYER_WHITE, currentMovements };
 }
+int FanoronaGame::winner() {
+    // Count the states of the board positions
+    std::map<int, int> stateCount;
+    stateCount[0] = 0; stateCount[PLAYER_WHITE] = 0; stateCount[PLAYER_BLACK] = 0;
+    for(int row = 0; row < 5; row++){
+        for(int col = 0; col < 9; col++) {
+            stateCount[grid[row][col]]++;
+        }
+    }
+    // White winning conditions
+    if(stateCount[PLAYER_WHITE] > 0 && stateCount[PLAYER_BLACK] == 0) {
+        return PLAYER_WHITE;
+    }
+    if(stateCount[PLAYER_BLACK] > 0 && stateCount[PLAYER_WHITE]== 0) {
+        return PLAYER_WHITE;
+    }
+    // TODO: Implement draw condition
+    return IN_PROGRESS;
+}
 
 Direction FanoronaGame::getDirection(Position const& from, Position const& to)
 {

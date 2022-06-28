@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <iostream>
 
+#define IN_PROGRESS -1
+#define DRAW 0
 #define PLAYER_WHITE 1
 #define PLAYER_BLACK 2
 
@@ -39,6 +41,8 @@ class FanoronaGame {
 
         void executeMovement(Movement const& m);
         void endMove();
+
+        int winner();
 
         // Debug & Helper Functions
         int at(Position const& p);
