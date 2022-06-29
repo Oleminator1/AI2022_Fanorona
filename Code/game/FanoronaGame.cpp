@@ -6,6 +6,16 @@ int FanoronaGame::STARTING_GRID[5][9] = {{ 1, 1, 1, 1, 1, 1, 1, 1, 1 },
                                          { 2, 2, 2, 2, 2, 2, 2, 2, 2 },
                                          { 2, 2, 2, 2, 2, 2, 2, 2, 2 }};
 
+FanoronaGame::FanoronaGame() { }
+FanoronaGame::FanoronaGame(const FanoronaGame& g) {
+    // Copy the vector of movements
+    std::vector<Movement> movements = g.currentMove.movements;
+    // Copy the struct of currentMove
+    currentMove = { g.currentMove.player, movements };
+    // Copy the game board over
+    std::copy(&g.grid[0][0], &g.grid[0][0]+5*9, &grid[0][0]);
+}
+
 void FanoronaGame::startGame() {
     // set the board to the starting configuration
     std::copy(&FanoronaGame::STARTING_GRID[0][0], &FanoronaGame::STARTING_GRID[0][0]+5*9, &grid[0][0]);

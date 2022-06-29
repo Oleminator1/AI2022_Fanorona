@@ -4,16 +4,40 @@ AiPlayer::AiPlayer(int p_id, FanoronaGame& p_game) : GamePlayer(p_id, p_game) {
 
 }
 
-void AiPlayer::evaluate() {
+/*
+Maximizing Player: AiPlayer.id
+Minimizing Player: other
 
+Score für non-strong: +/-10
+Score für strong: 15
+*/
+
+int AiPlayer::evaluate() {
+    int score = 0;
+    for(int row = 0; row < 5; row++) {
+        for(int col = 0; col < 9; col++) {
+            // Get the grid value of the current position
+            int at = game->grid[row][col];
+            // Skip if it's empty
+            if(at == 0) continue;
+            // Score is 10 for non-strong and 15 for strong position
+            int s = game->isStrongPosition(row, col) ? 15 : 10;
+            // Negate the score if it's the opponents piece (minimizing player)
+            if(at != id) {
+                s *= -1;
+            }
+            // Add to the total score
+            score += s;
+        }
+    }
+    return score;
 }
 
 void AiPlayer::minimax() {
-
+    FanoronaGame copiedGame = FanoronaGame(*game);
 }
 
 void AiPlayer::turnStarted() {
-    std::cout << "It's the AI's turn!" << std::endl;
     // Get possible movements for all movable stones
     std::vector<std::vector<Movement>> initialMovements;
     bool haveCapturing = false;
@@ -52,6 +76,7 @@ void AiPlayer::turnStarted() {
     std::cout << initialMovements.size() << " initial movable stones" << std::endl;
     
     game->executeMovement(initialMovements[0][0]);
+    std::cout << "Evaluation: " << evaluate() << std::endl;
     game->endMove();
 }
 

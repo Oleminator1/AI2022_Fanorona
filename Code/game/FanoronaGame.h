@@ -19,11 +19,14 @@ using json = nlohmann::json;
 class FanoronaGame {
     private:
         static int STARTING_GRID[5][9];
-        //int currentPlayer;
-        Move currentMove;
     public:
         // The Game Board
         int grid[5][9];
+        // Current Move
+        Move currentMove;
+
+        FanoronaGame();
+        FanoronaGame(const FanoronaGame& g);
 
         // Game Functions
         void startGame();
