@@ -17,6 +17,7 @@ class AiPlayer : public GamePlayer {
         AiPlayer(int p_id, FanoronaGame& p_game);
         void turnStarted() override;
         json status();
+        bool isAi() override;
 };
 
 #endif //AI2022_FANORONA_AI_PLAYER_H

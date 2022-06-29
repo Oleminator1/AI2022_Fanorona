@@ -40,6 +40,7 @@ void HumanPlayer::stoneSelected(Position const& p) {
         }
     }
 }
+bool HumanPlayer::isAi() { return false; }
 json HumanPlayer::status() {
     // Get the base status message
     json s = GamePlayer::status();

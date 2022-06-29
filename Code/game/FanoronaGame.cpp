@@ -51,10 +51,15 @@ int FanoronaGame::winner() {
     if(stateCount[PLAYER_WHITE] > 0 && stateCount[PLAYER_BLACK] == 0) {
         return PLAYER_WHITE;
     }
-    if(stateCount[PLAYER_BLACK] > 0 && stateCount[PLAYER_WHITE]== 0) {
+    // Black winning conditions
+    if(stateCount[PLAYER_BLACK] > 0 && stateCount[PLAYER_WHITE] == 0) {
         return PLAYER_WHITE;
     }
-    // TODO: Implement draw condition
+    // Draw conditions
+    if(stateCount[PLAYER_BLACK] == 1 && stateCount[PLAYER_WHITE] == 1) {
+        return DRAW;
+    }
+    // Otherwise, the game is still in progress
     return IN_PROGRESS;
 }
 

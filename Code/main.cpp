@@ -6,6 +6,9 @@
 
 #include <memory>
 #include <iostream>
+#include <chrono>
+#include <thread>
+#include <set>
 #include "game/FanoronaGame.h"
 #include "game/players/HumanPlayer.h"
 #include "game/players/AiPlayer.h"
@@ -29,6 +32,10 @@ using websocketpp::lib::bind;
 
 // pull out the type of messages sent by our config
 typedef server::message_ptr message_ptr;
+
+// Create a server endpoint
+server echo_server;
+std::set<websocketpp::connection_hdl,std::owner_less<websocketpp::connection_hdl>> connections;
 
 FanoronaGame game;
 std::map<int, std::shared_ptr<GamePlayer>> players;
@@ -70,10 +77,12 @@ json processCommand(json& message) {
         players.clear();
         std::shared_ptr<GamePlayer> ap = std::make_shared<AiPlayer>(1, game);
         players[1] = ap;
-        std::shared_ptr<GamePlayer> hp = std::make_shared<HumanPlayer>(2, game);
+        std::shared_ptr<GamePlayer> hp = std::make_shared<AiPlayer>(2, game);
         players[2] = hp;
         // Start the game
         game.startGame();
+        // Trigger turnStarted of first player
+        players[game.currentPlayer()]->turnStarted();
         // Return a status message
         return jsonStatus();
     } else if (cmd == CMD_SELECT) {
@@ -93,12 +102,34 @@ json processCommand(json& message) {
         }
         // Test of winner functionality
         int winner = game.winner();
-        if(winner == IN_PROGRESS) std::cout << "GAME IN PROGRESS" << std::endl;
-        else std::cout << "WINNER: " << (winner == PLAYER_WHITE ? "White" : "Black") << std::endl;
+        if(winner == IN_PROGRESS) {
+            std::cout << "GAME IN PROGRESS" << std::endl;
+        } else {
+            std::cout << "WINNER: " << (winner == PLAYER_WHITE ? "White" : "Black/Draw") << std::endl;
+            throw std::runtime_error("Winner");
+        }
         // Return a status message
         return jsonStatus();
     }
     return jsonError("Not a recognized command");
+}
+
+void onTimer(websocketpp::lib::error_code const & ec) {
+    players[game.currentPlayer()]->turnStarted();
+    for(auto const& hdl : connections) {
+        echo_server.send(hdl, jsonStatus().dump(), websocketpp::frame::opcode::text);
+    }
+    if(game.winner() == IN_PROGRESS) {
+        echo_server.set_timer(1000, bind(&onTimer, ::_1));
+    }
+}
+
+void onOpen(websocketpp::connection_hdl hdl) {
+    connections.insert(hdl);
+}
+
+void onClose(websocketpp::connection_hdl hdl) {
+    connections.erase(hdl);
 }
 // Define a callback to handle incoming messages
 void onMessage(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
@@ -107,6 +138,12 @@ void onMessage(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
     // Parse command as JSON and process
     auto message = json::parse(msg->get_payload());
     std::string resp = processCommand(message).dump();
+
+    // Special Case: AI vs AI, skip all the callback stuff in that case
+    if(players.size() > 0 && players[PLAYER_WHITE]->isAi() && players[PLAYER_BLACK]->isAi()) {
+        std::cout << "Both players are AI, starting timer" << std::endl;
+        echo_server.set_timer(1000, bind(&onTimer, ::_1));
+    }
 
     try {
         s->send(hdl, resp, msg->get_opcode());
@@ -117,9 +154,6 @@ void onMessage(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
 }
 
 int main() {
-    // Create a server endpoint
-    server echo_server;
-
     try {
         // Set logging settings
         //echo_server.set_access_channels(websocketpp::log::alevel::all);
@@ -130,6 +164,8 @@ int main() {
 
         // Register our message handler
         echo_server.set_message_handler(bind(&onMessage,&echo_server,::_1,::_2));
+        echo_server.set_open_handler(bind(&onOpen,_1));
+        echo_server.set_close_handler(bind(&onClose,_1));
 
         // Listen on port 9002
         echo_server.listen(SERVER_PORT);

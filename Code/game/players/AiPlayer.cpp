@@ -55,6 +55,7 @@ void AiPlayer::turnStarted() {
     game->endMove();
 }
 
+bool AiPlayer::isAi() { return true; }
 json AiPlayer::status() {
     return {
         {"id", id},

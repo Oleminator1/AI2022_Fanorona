@@ -19,6 +19,7 @@ class HumanPlayer : public GamePlayer {
         HumanPlayer(int p_id, FanoronaGame& p_game);
         void stoneSelected(Position const& p);
         json status();
+        bool isAi() override;
 };
 
 #endif //AI2022_FANORONA_HUMAN_PLAYER_H

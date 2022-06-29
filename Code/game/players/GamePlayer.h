@@ -16,6 +16,7 @@ class GamePlayer {
         virtual void stoneSelected(Position const& p);
         virtual void turnStarted();
         virtual json status();
+        virtual bool isAi() = 0;
 };
 
 #endif //AI2022_FANORONA_GAME_PLAYER_H
