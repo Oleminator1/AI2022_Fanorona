@@ -76,8 +76,10 @@ json processCommand(json& message) {
         // Add the two players
         players.clear();
         std::shared_ptr<GamePlayer> ap = std::make_shared<AiPlayer>(1, game, 4);
+        //std::shared_ptr<GamePlayer> ap = std::make_shared<HumanPlayer>(1, game);
         players[1] = ap;
         std::shared_ptr<GamePlayer> hp = std::make_shared<AiPlayer>(2, game, 4);
+        //std::shared_ptr<GamePlayer> hp = std::make_shared<HumanPlayer>(2, game);
         players[2] = hp;
         // Start the game
         game.startGame();

@@ -41,6 +41,7 @@ class FanoronaGame {
         bool isStrongPosition(int row, int col);
         Movement generateMovement(int row, int col, int deltaRow, int deltaCol, int player);
         std::vector<Movement> generateMovements(int row, int col, int player);
+        void generateMoves(int player, std::vector<Move>& moves);
 
         void executeMovement(Movement const& m);
         void endMove();

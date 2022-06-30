@@ -39,10 +39,10 @@ void FanoronaGame::executeMovement(Movement const& m) {
     }
     // Move the stone to the "to" position in any case
     grid[m.to.row][m.to.col] = currentMove.player;
-    std::cout << "Pushing into movements (" << currentMove.movements.size() << ")" << std::endl;
+    //std::cout << "Pushing into movements (" << currentMove.movements.size() << ")" << std::endl;
     // Add the movement to the current move
     currentMove.movements.push_back(m);
-    std::cout << "Movement finished" << std::endl;
+    //std::cout << "Movement finished" << std::endl;
 }
 void FanoronaGame::endMove() {
     std::vector<Movement> currentMovements;
@@ -218,6 +218,57 @@ std::vector<Movement> FanoronaGame::generateMovements(int row, int col, int play
     }
     // Return the fruits of our labour
     return movements;
+}
+void FanoronaGame::generateMoves(int player, std::vector<Move>& moves) {
+    if(moves.size() == 0){
+        // If this is the first run, get possible movements for all stones
+        bool haveCapturing = false;
+        for(int row = 0; row < 5; row++) {
+            for(int col = 0; col < 9; col++) {
+                // If it's not our stone, we can skip it
+                if(at({ row, col }) != player) continue;
+                // Generate possible movements
+                auto movements = generateMovements(row, col, player);
+                // If there's 0 movements available for this stone, skip it
+                if(movements.size() == 0) continue;
+                // If we aren't already in "capturing moves only" mode, check for any
+                if(!haveCapturing){
+                    for(auto const& m : movements) {
+                        if(m.isCapturing){ haveCapturing = true; break; }
+                    }
+                }
+                // Add to moves
+                for(Movement movement : movements) {
+                    std::vector<Movement> firstMoveMovements;
+                    firstMoveMovements.push_back(movement);
+                    moves.push_back({ player, firstMoveMovements });
+                }
+            }
+        }
+        // If we're in "capturing moves only" mode, remove anything that has non-capturing movements
+        if(haveCapturing){
+            std::vector<Move>::iterator it = moves.begin();
+            while(it != moves.end()) {
+                if(!it->movements[0].isCapturing) {
+                    it = moves.erase(it);
+                }else{
+                    //std::cout << it->at(0).from.row << ", " << it->at(0).from.col << " -> " << it->at(0).to.row << ", " << it->at(0).to.col << " " << (it->at(0).attackType ? "Withdraw" : "Approach") << std::endl;
+                    ++it;
+                }
+            }
+        }
+        // Call generateMoves on all subsequent runs
+        /*for(auto const& move : moves) {
+            // Copy the game instance
+            FanoronaGame g(*this);
+            // Apply the movements
+            for(auto const& movement : move.movements) { g.executeMovement(movement); }
+            // Evaluate any further possible movements of this move
+            g.generateMoves(player, moves);
+        }*/
+    }else{
+        // If this is a subsequent run, base all additional moves on existing ones
+    }
 }
 
 bool FanoronaGame::isStrongPosition(int row, int col)
