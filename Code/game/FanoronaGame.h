@@ -43,7 +43,7 @@ class FanoronaGame {
         std::vector<Movement> generateMovements(int row, int col, int player);
         void generateMoves(int player, std::vector<Move>& moves);
 
-        void executeMovement(Movement const& m);
+        void executeMovement(Movement m);
         void endMove();
 
         int winner();

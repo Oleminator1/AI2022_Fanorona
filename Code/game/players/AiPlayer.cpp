@@ -75,8 +75,10 @@ void AiPlayer::turnStarted() {
     std::vector<Move> moves;
     game->generateMoves(id, moves);
     std::cout << "===== NEW AI MOVE (" << (id == PLAYER_WHITE ? "White" : "Black") << ") (" << moves[0].movements.size() <<" movements) =====" << std::endl;
-    for(auto const& movement : moves[0].movements){
-        game->executeMovement(movement);
+    std::cout << moves.size() << " moves available" << std::endl;
+    for(auto const& m : moves[0].movements){
+        std::cout << "Movement: (" << m.from.row << "," << m.from.col << ") => (" << m.to.row << "," << m.to.col << ") | Capturing: " << (m.isCapturing ? "Yes" : "No") << " | AttackType: " << (m.attackType ? "Withdraw" : "Attack") << std::endl;
+        game->executeMovement(m);
     }
     game->endMove();
 }

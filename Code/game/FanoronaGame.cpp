@@ -24,8 +24,8 @@ void FanoronaGame::startGame() {
     currentMove = { PLAYER_BLACK, currentMovements };
     //currentPlayer = PLAYER_WHITE;
 }
-void FanoronaGame::executeMovement(Movement const& m) {
-    std::cout << "Movement: (" << m.from.row << "," << m.from.col << ") => (" << m.to.row << "," << m.to.col << ") | Capturing: " << (m.isCapturing ? "Yes" : "No") << " | AttackType: " << (m.attackType ? "Withdraw" : "Attack") << std::endl;
+void FanoronaGame::executeMovement(Movement m) {
+    //std::cout << "Movement: (" << m.from.row << "," << m.from.col << ") => (" << m.to.row << "," << m.to.col << ") | Capturing: " << (m.isCapturing ? "Yes" : "No") << " | AttackType: " << (m.attackType ? "Withdraw" : "Attack") << std::endl;
     // Set the from position to empty as we're moving away from it
     grid[m.from.row][m.from.col] = 0;
     // If the move is capturing, we have to perform some more complicated stuff
@@ -221,6 +221,7 @@ std::vector<Movement> FanoronaGame::generateMovements(int row, int col, int play
 }
 void FanoronaGame::generateMoves(int player, std::vector<Move>& moves) {
     if(moves.size() == 0){
+        //std::cout << "Generating initial movements" << std::endl;
         // If this is the first run, get possible movements for all stones
         bool haveCapturing = false;
         for(int row = 0; row < 5; row++) {
@@ -257,17 +258,37 @@ void FanoronaGame::generateMoves(int player, std::vector<Move>& moves) {
                 }
             }
         }
+        //std::cout << moves.size() << " initial moves" << std::endl;
         // Call generateMoves on all subsequent runs
-        /*for(auto const& move : moves) {
+        for(auto move : moves) {
+            //std::cout << "INITIAL MOVE" << std::endl;
             // Copy the game instance
             FanoronaGame g(*this);
             // Apply the movements
-            for(auto const& movement : move.movements) { g.executeMovement(movement); }
+            //std::cout << move.movements.size() << " movements" << std::endl;
+            for(auto movement : move.movements) { g.executeMovement(movement); }
             // Evaluate any further possible movements of this move
             g.generateMoves(player, moves);
-        }*/
+        }
     }else{
+        //std::cout << "Generating subsequent moves" << std::endl;
         // If this is a subsequent run, base all additional moves on existing ones
+        std::vector<Move> localMoves = moves;
+        for(auto move : localMoves) {
+            // Copy se game instanz
+            FanoronaGame g(*this);
+            //std::cout << move.movements.size() << " movements" << std::endl;
+            // Apply se movementz
+            for(auto movement : move.movements) { g.executeMovement(movement); }
+            // Generate new movementz based on ze last position of ze moves
+            std::vector<Movement> newMovements = g.generateMovements(move.movements.back().to.row, move.movements.back().to.col, player);
+            // Add new moves with all the new movements appended
+            for(Movement newMovement : newMovements) {
+                std::vector<Movement> ms = move.movements;
+                ms.push_back(newMovement);
+                moves.push_back({ player, ms });
+            }
+        }
     }
 }
 
