@@ -219,7 +219,7 @@ std::vector<Movement> FanoronaGame::generateMovements(int row, int col, int play
     // Return the fruits of our labour
     return movements;
 }
-void FanoronaGame::generateMoves(int player, std::vector<Move>& moves) {
+std::vector<Move> FanoronaGame::generateMoves(int player, std::vector<Move> moves) {
     if(moves.size() == 0){
         //std::cout << "Generating initial movements" << std::endl;
         // If this is the first run, get possible movements for all stones
@@ -260,6 +260,7 @@ void FanoronaGame::generateMoves(int player, std::vector<Move>& moves) {
         }
         //std::cout << moves.size() << " initial moves" << std::endl;
         // Call generateMoves on all subsequent runs
+        /*std::vector<Move> resultMoves;
         for(auto move : moves) {
             //std::cout << "INITIAL MOVE" << std::endl;
             // Copy the game instance
@@ -268,13 +269,23 @@ void FanoronaGame::generateMoves(int player, std::vector<Move>& moves) {
             //std::cout << move.movements.size() << " movements" << std::endl;
             for(auto movement : move.movements) { g.executeMovement(movement); }
             // Evaluate any further possible movements of this move
-            g.generateMoves(player, moves);
-        }
+            std::vector<Move> moveMoves = g.generateMoves(player, moves);
+            for(auto moveMove : moveMoves) { resultMoves.push_back(moveMove); }
+        }*/
+        return moves;
     }else{
         //std::cout << "Generating subsequent moves" << std::endl;
         // If this is a subsequent run, base all additional moves on existing ones
-        std::vector<Move> localMoves = moves;
+        /*std::vector<Move> localMoves;
+        for(auto move : moves) { 
+            std::vector<Movement> mm;
+            for(auto movement : move.movements) { mm.push_back({ {movement.from.col, movement.from.row}, {movement.to.col, movement.to.row}, movement.isCapturing, movement.attackType }); }
+            localMoves.push_back({ move.player, mm });
+        }
+
         for(auto move : localMoves) {
+            // ???
+            if(move.movements.size() == 0) continue;
             // Copy se game instanz
             FanoronaGame g(*this);
             //std::cout << move.movements.size() << " movements" << std::endl;
@@ -284,11 +295,13 @@ void FanoronaGame::generateMoves(int player, std::vector<Move>& moves) {
             std::vector<Movement> newMovements = g.generateMovements(move.movements.back().to.row, move.movements.back().to.col, player);
             // Add new moves with all the new movements appended
             for(Movement newMovement : newMovements) {
-                std::vector<Movement> ms = move.movements;
+                std::vector<Movement> ms;
+                for(auto movement : move.movements) { ms.push_back({ {movement.from.col, movement.from.row}, {movement.to.col, movement.to.row}, movement.isCapturing, movement.attackType }); }
                 ms.push_back(newMovement);
                 moves.push_back({ player, ms });
             }
-        }
+        }*/
+        return moves;
     }
 }
 

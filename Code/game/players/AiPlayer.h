@@ -9,12 +9,18 @@
 
 using json = nlohmann::json;
 
+/*struct MoveScore {
+    Move move;
+    int score;
+};*/
+
 class AiPlayer : public GamePlayer {
     private:
         int height;
+        Move bestMove;
 
         int evaluate(FanoronaGame& state);
-        int minimax(FanoronaGame state, int player, int depth, int alpha, int beta);
+        int minimax(FanoronaGame state, int player, Move executedMove, int depth, int alpha, int beta);
     public:
         AiPlayer(int p_id, FanoronaGame& p_game, int p_height);
         void turnStarted() override;

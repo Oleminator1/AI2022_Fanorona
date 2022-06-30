@@ -75,10 +75,10 @@ json processCommand(json& message) {
     if(cmd == CMD_START) {
         // Add the two players
         players.clear();
-        std::shared_ptr<GamePlayer> ap = std::make_shared<AiPlayer>(1, game, 4);
+        std::shared_ptr<GamePlayer> ap = std::make_shared<AiPlayer>(1, game, 2);
         //std::shared_ptr<GamePlayer> ap = std::make_shared<HumanPlayer>(1, game);
         players[1] = ap;
-        std::shared_ptr<GamePlayer> hp = std::make_shared<AiPlayer>(2, game, 4);
+        std::shared_ptr<GamePlayer> hp = std::make_shared<AiPlayer>(2, game, 2);
         //std::shared_ptr<GamePlayer> hp = std::make_shared<HumanPlayer>(2, game);
         players[2] = hp;
         // Start the game
@@ -180,6 +180,8 @@ int main() {
         std::cout << "Server is ready at ws://127.0.0.1:" << std::to_string(SERVER_PORT) << std::endl;
         echo_server.run();
     } catch (websocketpp::exception const & e) {
+        std::cout << e.what() << std::endl;
+    } catch (std::exception & e) {
         std::cout << e.what() << std::endl;
     } catch (...) {
         std::cout << "other exception" << std::endl;
