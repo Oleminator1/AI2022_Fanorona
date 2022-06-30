@@ -4,8 +4,15 @@
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
+#include <memory>
 #include <iostream>
+#include <chrono>
+#include <thread>
+#include <set>
 #include "game/FanoronaGame.h"
+#include "game/players/HumanPlayer.h"
+#include "game/players/AiPlayer.h"
+#include "game/util/Structs.h"
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
@@ -17,7 +24,7 @@ using websocketpp::lib::bind;
 #define CMD_ERROR "error"
 #define CMD_SELECT "select"
 #define CMD_MOVE "move"
-#define CMD_BOARD "board"
+#define CMD_STATUS "status"
 #define CMD_START "start"
 #define CMD_MOVEMENTS "movements"
 
@@ -26,7 +33,12 @@ using websocketpp::lib::bind;
 // pull out the type of messages sent by our config
 typedef server::message_ptr message_ptr;
 
+// Create a server endpoint
+server echo_server;
+std::set<websocketpp::connection_hdl,std::owner_less<websocketpp::connection_hdl>> connections;
+
 FanoronaGame game;
+std::map<int, std::shared_ptr<GamePlayer>> players;
 
 json jsonError(std::string error) {
     return {
@@ -34,13 +46,14 @@ json jsonError(std::string error) {
         {"message", error}
     };
 }
-json jsonBoard() {
+json jsonStatus() {
     return {
-        {KEY_COMMAND, CMD_BOARD},
-        {"board", game.grid}
+        {KEY_COMMAND, CMD_STATUS},
+        {"board", game.grid},
+        {"player", players[game.currentPlayer()]->status()}
     };
 }
-json jsonMovements(std::vector<Movement> const& movements) {
+/*json jsonMovements(std::vector<Movement> const& movements) {
     std::vector<json> movementsJson;
     for(auto const& movement : movements) {
         movementsJson.push_back({ 
@@ -51,7 +64,7 @@ json jsonMovements(std::vector<Movement> const& movements) {
         {KEY_COMMAND, CMD_MOVEMENTS},
         {"movements", movementsJson}
     };
-}
+}*/
 
 json processCommand(json& message) {
     if(!message.contains(KEY_COMMAND)){
@@ -60,30 +73,65 @@ json processCommand(json& message) {
     }
     std::string cmd = message[KEY_COMMAND].get<std::string>();
     if(cmd == CMD_START) {
+        // Add the two players
+        players.clear();
+        std::shared_ptr<GamePlayer> ap = std::make_shared<AiPlayer>(1, game, 2);
+        //std::shared_ptr<GamePlayer> ap = std::make_shared<HumanPlayer>(1, game);
+        players[1] = ap;
+        std::shared_ptr<GamePlayer> hp = std::make_shared<AiPlayer>(2, game, 2);
+        //std::shared_ptr<GamePlayer> hp = std::make_shared<HumanPlayer>(2, game);
+        players[2] = hp;
+        // Start the game
         game.startGame();
-        return jsonBoard();
+        // Trigger turnStarted of first player
+        players[game.currentPlayer()]->turnStarted();
+        // Return a status message
+        return jsonStatus();
     } else if (cmd == CMD_SELECT) {
         // Convert the JSON values into more practical structs
         Position p = { message["position"]["row"].get<int>(), message["position"]["col"].get<int>() };
-        // Try to select the stone
-        std::vector<Movement> ms;
-        try{ ms = game.selectStone(p); } catch(const std::runtime_error& e) { return jsonError(e.what()); }
-        // Return the possible movements
-        return jsonMovements(ms);
-    } else if (cmd == CMD_MOVE) {
-        // Convert the JSON values into more practical structs
-        Position from = { message["from"]["row"].get<int>(), message["from"]["col"].get<int>() };
-        Position to = { message["to"]["row"].get<int>(), message["to"]["col"].get<int>() };
-        // Try to apply the move and return the board
+        // Save the currently active player
+        int previousPlayer = game.currentPlayer();
+        // Pass the selection to the player
         try{
-            //game.moveStone(from.row, from.col, to.row, to.col);
-        } catch(const std::exception& e) {
+            players[game.currentPlayer()]->stoneSelected(p);
+        }catch(const std::runtime_error& e) {
             return jsonError(e.what());
         }
-        
-        return jsonBoard();
+        // If the player changed, trigger the turnStarted of the new player
+        if(game.currentPlayer() != previousPlayer) {
+            players[game.currentPlayer()]->turnStarted();
+        }
+        // Test of winner functionality
+        int winner = game.winner();
+        if(winner == IN_PROGRESS) {
+            std::cout << "GAME IN PROGRESS" << std::endl;
+        } else {
+            std::cout << "WINNER: " << (winner == PLAYER_WHITE ? "White" : "Black/Draw") << std::endl;
+            throw std::runtime_error("Winner");
+        }
+        // Return a status message
+        return jsonStatus();
     }
     return jsonError("Not a recognized command");
+}
+
+void onTimer(websocketpp::lib::error_code const & ec) {
+    players[game.currentPlayer()]->turnStarted();
+    for(auto const& hdl : connections) {
+        echo_server.send(hdl, jsonStatus().dump(), websocketpp::frame::opcode::text);
+    }
+    if(game.winner() == IN_PROGRESS) {
+        echo_server.set_timer(1000, bind(&onTimer, ::_1));
+    }
+}
+
+void onOpen(websocketpp::connection_hdl hdl) {
+    connections.insert(hdl);
+}
+
+void onClose(websocketpp::connection_hdl hdl) {
+    connections.erase(hdl);
 }
 // Define a callback to handle incoming messages
 void onMessage(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
@@ -92,6 +140,12 @@ void onMessage(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
     // Parse command as JSON and process
     auto message = json::parse(msg->get_payload());
     std::string resp = processCommand(message).dump();
+
+    // Special Case: AI vs AI, skip all the callback stuff in that case
+    if(players.size() > 0 && players[PLAYER_WHITE]->isAi() && players[PLAYER_BLACK]->isAi()) {
+        std::cout << "Both players are AI, starting timer" << std::endl;
+        echo_server.set_timer(1000, bind(&onTimer, ::_1));
+    }
 
     try {
         s->send(hdl, resp, msg->get_opcode());
@@ -102,19 +156,19 @@ void onMessage(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
 }
 
 int main() {
-    // Create a server endpoint
-    server echo_server;
-
     try {
         // Set logging settings
-        echo_server.set_access_channels(websocketpp::log::alevel::all);
-        echo_server.clear_access_channels(websocketpp::log::alevel::frame_payload);
+        //echo_server.set_access_channels(websocketpp::log::alevel::all);
+        //echo_server.clear_access_channels(websocketpp::log::alevel::frame_payload);
+        echo_server.clear_access_channels(websocketpp::log::alevel::all);
 
         // Initialize Asio
         echo_server.init_asio();
 
         // Register our message handler
         echo_server.set_message_handler(bind(&onMessage,&echo_server,::_1,::_2));
+        echo_server.set_open_handler(bind(&onOpen,_1));
+        echo_server.set_close_handler(bind(&onClose,_1));
 
         // Listen on port 9002
         echo_server.listen(SERVER_PORT);
@@ -126,6 +180,8 @@ int main() {
         std::cout << "Server is ready at ws://127.0.0.1:" << std::to_string(SERVER_PORT) << std::endl;
         echo_server.run();
     } catch (websocketpp::exception const & e) {
+        std::cout << e.what() << std::endl;
+    } catch (std::exception & e) {
         std::cout << e.what() << std::endl;
     } catch (...) {
         std::cout << "other exception" << std::endl;
