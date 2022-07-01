@@ -30,6 +30,8 @@ using websocketpp::lib::bind;
 
 #define SERVER_PORT 9002
 
+#define AI_DEPTH 2
+
 // pull out the type of messages sent by our config
 typedef server::message_ptr message_ptr;
 
@@ -73,14 +75,27 @@ json processCommand(json& message) {
     }
     std::string cmd = message[KEY_COMMAND].get<std::string>();
     if(cmd == CMD_START) {
-        // Add the two players
+        // Clear existing players
         players.clear();
-        std::shared_ptr<GamePlayer> ap = std::make_shared<AiPlayer>(1, game, 2);
-        //std::shared_ptr<GamePlayer> ap = std::make_shared<HumanPlayer>(1, game);
-        players[1] = ap;
-        std::shared_ptr<GamePlayer> hp = std::make_shared<AiPlayer>(2, game, 2);
-        //std::shared_ptr<GamePlayer> hp = std::make_shared<HumanPlayer>(2, game);
-        players[2] = hp;
+        // Get player types from start command
+        int playerId = 1;
+        for(auto playerType : message["players"]) {
+            // Ignore by the third player (only two allowed)
+            if(playerId == 3) break;
+            // Get the player type string from JSON (human or ai)
+            std::string type = playerType.get<std::string>();
+            // Add player by type
+            std::shared_ptr<GamePlayer> player;
+            if(type == "human") {
+                player = std::make_shared<HumanPlayer>(playerId, game);
+            } else if(type == "ai") {
+                player = std::make_shared<AiPlayer>(playerId, game, AI_DEPTH);
+            } else {
+                throw std::runtime_error("Invalid player type");
+            }
+            players[playerId] = player;
+            playerId++;
+        }
         // Start the game
         game.startGame();
         // Trigger turnStarted of first player
@@ -102,7 +117,7 @@ json processCommand(json& message) {
         if(game.currentPlayer() != previousPlayer) {
             players[game.currentPlayer()]->turnStarted();
         }
-        // Test of winner functionality
+        // Winner functionality
         int winner = game.winner();
         if(winner == IN_PROGRESS) {
             std::cout << "GAME IN PROGRESS" << std::endl;

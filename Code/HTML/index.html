@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Fanorona UATW - Choose a Game</title>
-    <link rel="shortcut icon" type="image/jpg" href="fhtw-logo.jpg">
-</head>
-<body>
-<h1>Welcome to Fanorona!</h1>
-<h2>Select a Game mode:</h2>
-<a href="Board.html">
-    <button type="button">Player VS. Player</button><p>
-    <button type="button">Player VS. Computer</button><p>
-    <button type="button">Computer VS. Computer</button>
-</a>
-<p>
-<a href="imprint.html" title="imprint">
-    <button type="button">See who implemented it!</button>
-</a>
-</body>
+    <link rel="shortcut icon" type="image/jpg" href="fhtw-logo.jpg" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+  </head>
+  <body>
+    <div class="content">
+      <h1>Welcome to Fanorona!</h1>
+      <h2 class="light">Select a Game mode:</h2>
+      <a href="Board.html#human-human" class="-btn -bg -txt">
+        <div>Human vs Human<br /></div>
+      </a>
+      <a href="Board.html#human-ai" class="-btn -bg -txt">
+        <div>Human vs AI<br /></div>
+      </a>
+      <a href="Board.html#ai-ai" class="-btn -bg -txt">
+        <div>AI vs AI<br /></div>
+      </a>
+      <a
+        href="imprint.html"
+        title="imprint"
+        style="display: block; margin-top: 20px"
+      >
+        See who implemented it!
+      </a>
+    </div>
+  </body>
 </html>

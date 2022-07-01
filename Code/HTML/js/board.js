@@ -123,9 +123,10 @@ function GameConnection(address) {
         this.sock = new WebSocket(this.address);
         this.sock.addEventListener("message", e => this.onMessage(JSON.parse(e.data)));
         this.sock.addEventListener("open", e => this.onConnectedCallback());
+        this.sock.addEventListener("error", e => this.onErrorCallback("Connection Failure"));
     }
-    this.startGame = () => {
-        this.sock.send(JSON.stringify({ command: "start" }));
+    this.startGame = (players) => {
+        this.sock.send(JSON.stringify({ command: "start", players }));
     }
     this.selectPawn = (position) => {
         this.sock.send(JSON.stringify({ command: "select", position }));
@@ -175,7 +176,7 @@ gc.onStatus(gameStatus => {
 
 gc.onError(message => mb.setError(message));
 gc.onConnected(() => {
-    gc.startGame();
+    gc.startGame(location.hash.substring(1).split("-"));
 });
 gb.onPawnSelect(pos => {
     gc.selectPawn(pos);
